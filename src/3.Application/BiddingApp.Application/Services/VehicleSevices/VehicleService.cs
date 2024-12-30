@@ -38,7 +38,7 @@ namespace BiddingApp.Application.Services.VehicleSevices
                 };
             }
             catch (BadRequestException)
-            { 
+            {
                 throw;
             }
             catch (Exception ex)
@@ -61,19 +61,85 @@ namespace BiddingApp.Application.Services.VehicleSevices
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                Message = "Bidding sessions fetched successfully",
+                Message = "Vehicle fetched successfully",
                 Data = pagingResult
             };
         }
 
-        public Task<ApiResponse<VehicleVm>> GetVehicleByVin(string vin)
+        public async Task<ApiResponse<VehicleVm>> GetVehicleByVin(string vin)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByVINAsync(vin);
+                if (vehicle == null) throw new NotFoundException($"Vehicle with VIN Code {vin} does not exist!");
+                var vehicleVm = _mapper.Map<VehicleVm>(vehicle);
+                return new ApiResponse<VehicleVm>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Vehicle fetched successfully",
+                    Data = vehicleVm
+                };
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new InternalServerException("Error from server");
+            }
         }
 
-        public Task<ApiResponse<bool>> UpdateVehicle(int id, UpdateVehicleRequest request)
+        public async Task<ApiResponse<VehicleVm>> GetVehicleById(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(id);
+                if (vehicle == null) throw new NotFoundException($"Vehicle with Id {id} does not exist!");
+                var vehicleVm = _mapper.Map<VehicleVm>(vehicle);
+                return new ApiResponse<VehicleVm>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Vehicle fetched successfully",
+                    Data = vehicleVm
+                };
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new InternalServerException("Error from server");
+            }
+        }
+
+        public async Task<ApiResponse<bool>> UpdateVehicle(int id, UpdateVehicleRequest request)
+        {
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync();
+                var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(id);
+                if (vehicle is null) throw new NotFoundException("Vehicle not found");
+                await _unitOfWork.VehicleRepository.UpdateVehicleAsync(id, request);
+                await _unitOfWork.CommitTransactionAsync();
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Vehicle updated successfully"
+                };
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new InternalServerException("Error from server");
+            }
         }
 
         public Task<ApiResponse<bool>> DeleteVehicle(int id)

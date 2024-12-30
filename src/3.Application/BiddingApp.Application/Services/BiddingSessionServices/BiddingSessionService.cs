@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
+using BiddingApp.Domain.Models.Enums;
 using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.BiddingSessionDtos;
 using BiddingApp.Infrastructure.Pagination;
@@ -26,8 +28,16 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
         {
             try
             {
+                // Check vehicle is available
+                var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(request.VehicleId);
+                if (vehicle is null) throw new NotFoundException("Vehicle not exist");
+                if (vehicle.Status != VehicleStatus.Available) throw new BadRequestException("Can not create new bidding session, vehicle is not available");
+
                 // Call the repository to create the bidding session
                 await _unitOfWork.BiddingSessionRepository.CreateBiddingSessionAsync(request);
+
+                // Update new status for vehicle
+                await _unitOfWork.VehicleRepository.UpdateVehicleStatusAsync(request.VehicleId, VehicleStatus.InBidding);
 
                 return new ApiResponse<bool>
                 {
@@ -35,6 +45,14 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                     StatusCode = StatusCodes.Status201Created,
                     Message = SystemConstants.BiddingSessionMessageResponses.BiddingSessionCreated
                 };
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (BadRequestException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -86,7 +104,16 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
         {
             try
             {
+
+                var session = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(id);
+                if (session is null) throw new NotFoundException("Session not found");
+
                 await _unitOfWork.BiddingSessionRepository.CloseBiddingSessionAsync(id);
+
+                //update status of vehicle when close session
+                var isBidding = await _unitOfWork.BidRepository.GetBiddingListByBiddingSessionIdAsync(session.Id);
+                if (isBidding.Count > 0) await _unitOfWork.VehicleRepository.UpdateVehicleStatusAsync(session.VehicleId, VehicleStatus.Sold);
+                else await _unitOfWork.VehicleRepository.UpdateVehicleStatusAsync(session.VehicleId, VehicleStatus.Available);
 
                 return new ApiResponse<bool>
                 {
@@ -94,6 +121,11 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                     StatusCode = StatusCodes.Status200OK,
                     Message = SystemConstants.BiddingSessionMessageResponses.BiddingSessionUpdated
                 };
+            }
+
+            catch (NotFoundException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

@@ -1,6 +1,7 @@
 ﻿using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
+using BiddingApp.Domain.Models.Enums;
 using BiddingApp.Infrastructure.Dtos.VehicleDtos;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using System.Data;
 
 namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
 {
-    public class VehicalRepository :IVehicleRepository
+    public class VehicalRepository : IVehicleRepository
     {
         private readonly ApplicationDbContext _dbContext;
 
@@ -93,12 +94,76 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
 
         public async Task<Vehicle> GetVehicleByVINAsync(string vin)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Execute the stored procedure and fetch the vehicle
+                var vehicle = await _dbContext.Vehicles
+                    .FromSqlRaw("EXEC dbo.GetVehicleByVIN @VIN",
+                        new SqlParameter("@VIN", vin))
+                    .ToListAsync();
+                return vehicle.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the GetVehicleByVIN stored procedure", ex.Message);
+            }
         }
 
-        public async Task<bool> UpdateVehicleAsync(int id, UpdateVehicleRequest todoVm)
+        public async Task<bool> UpdateVehicleAsync(int id, UpdateVehicleRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Execute the stored procedure
+                await _dbContext.Database.ExecuteSqlRawAsync(
+                "EXEC dbo.UpdateVehicle @Id, @Name, @Description, @Brand, @Price, @Color, @ImageUrl, @Status",
+                new SqlParameter("@Id", id),
+                new SqlParameter("@Name", request.Name),
+                new SqlParameter("@Description", request.Desciption),
+                new SqlParameter("@Brand", request.Brands),
+                new SqlParameter("@Price", request.Price),
+                new SqlParameter("@Color", request.Color),
+                new SqlParameter("@ImageUrl", request.ImageUrl),
+                new SqlParameter("@Status", request.Status));
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the UpdateVehicle stored procedure", ex.Message);
+            }
+        }
+
+        public async Task<bool> UpdateVehicleStatusAsync(int id, VehicleStatus status)
+        {
+            try
+            {
+                // Execute the stored procedure
+                await _dbContext.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.UpdateVehicleStatus @Id, @Status",
+                    new SqlParameter("@Id", id),
+                    new SqlParameter("@Status", status));
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the UpdateVehicleStatus stored procedure", ex.Message);
+            }
+        }
+
+        public async Task<Vehicle> GetVehicleByIdAsync(int id)
+        {
+            try
+            {
+                var vehicle = await _dbContext.Vehicles
+                    .FromSqlRaw("EXEC dbo.GetVehicleById @Id", new SqlParameter("@Id", id))
+                    .ToListAsync();
+                return vehicle.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the GetVehicleByVIN stored procedure", ex.Message);
+            }
         }
 
         public async Task<bool> DeleteVehicleAsync(int id)

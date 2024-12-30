@@ -2,9 +2,9 @@
 {
     public enum VehicleStatus
     {
-        InStock,
+        Available,
         InBidding,
-        InProgress,
-        Sold
+        Sold,
+        NotAvailable
     }
 }
