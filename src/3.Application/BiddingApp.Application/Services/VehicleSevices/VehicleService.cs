@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.Domain.Models;
+using BiddingApp.Domain.Models.Enums;
 using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.VehicleDtos;
 using BiddingApp.Infrastructure.Pagination;
@@ -142,9 +143,37 @@ namespace BiddingApp.Application.Services.VehicleSevices
             }
         }
 
-        public Task<ApiResponse<bool>> DeleteVehicle(int id)
+        public async Task<ApiResponse<bool>> DeleteVehicle(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // check vehicle valid
+                var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(id);
+                if (vehicle is null) throw new NotFoundException("Vehicle does not exist");
+                if (vehicle.Status != VehicleStatus.NotAvailable) throw new BadRequestException("System just allow for delete the vehicle with status is 'not available' only");
+                
+                await _unitOfWork.BeginTransactionAsync();
+                await _unitOfWork.VehicleRepository.DeleteVehicleAsync(id);
+                await _unitOfWork.CommitTransactionAsync();
+                return new ApiResponse<bool>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Vehicle Deleted sucessfully"
+                };
+            }
+            catch (BadRequestException)
+            {
+                throw;
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception)
+            {
+                throw new InternalServerException("Error from server");
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BiddingApp.BuildingBlock.Exceptions;
+using BiddingApp.Domain.Models;
 using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Domain.Models.Enums;
@@ -168,7 +169,20 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
 
         public async Task<bool> DeleteVehicleAsync(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Execute the stored procedure
+                await _dbContext.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.DeleteVehicle @Id",
+                    new SqlParameter("@Id", id)
+                );
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the GetVehicleByVIN stored procedure", ex.Message);
+            }
         }
     }
 }

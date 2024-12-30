@@ -105,5 +105,23 @@ namespace BiddingApp.Api.Controllers
             var response = await _vehicleService.UpdateVehicle(id, request);
             return Ok(response);
         }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteVehicle (int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = SystemConstants.ModelStateResponses.ModelStateInvalid
+                });
+            }
+            var response = await _vehicleService.DeleteVehicle(id);
+            return Ok(response);
+        }
     }
 }
