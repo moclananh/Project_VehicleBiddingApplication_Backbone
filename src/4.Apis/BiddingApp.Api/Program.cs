@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using BiddingApp.Application.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
+
+//register signalr
+builder.Services.AddSignalR();
 
 //declare DI
 builder.Services.AddScoped<IUserService, UserService>();
@@ -143,5 +147,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<BiddingHub>("/biddingHub");
 
 app.Run();
