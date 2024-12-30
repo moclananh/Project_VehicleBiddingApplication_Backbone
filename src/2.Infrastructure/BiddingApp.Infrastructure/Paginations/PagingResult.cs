@@ -6,14 +6,16 @@ namespace BiddingApp.Infrastructure.Pagination
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
-        public int TotalCount { get; set; }
+        public int TotalItems { get; set; }
+        public int ItemCounts { get; set; }
         public List<T> Items { get; set; }
 
-        public PagingResult(int pageNumber, int pageSize, int totalCount, List<T> items)
+        public PagingResult(int pageNumber, int pageSize, int totalItems, int itemCounts, List<T> items)
         {
             PageNumber = pageNumber;
             PageSize = pageSize;
-            TotalCount = totalCount;
+            TotalItems = totalItems;
+            ItemCounts = itemCounts;
             Items = items;
         }
     }

@@ -43,6 +43,26 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             }
         }
 
+
+        public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingSessions(BiddingSessionFilter request)
+        {
+            var result = await _unitOfWork.BiddingSessionRepository.GetAllBiddingSessionsAsync(request);
+
+            // Map the Todo entities to TodoVm ViewModels
+            var resultVmList = _mapper.Map<List<BiddingSessionVm>>(result.BiddingSessions);
+
+            // Create the paging result
+            var pagingResult = new PagingResult<BiddingSessionVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
+
+            return new ApiResponse<PagingResult<BiddingSessionVm>>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Bidding sessions fetched successfully",
+                Data = pagingResult
+            };
+        }
+
         public async Task<ApiResponse<bool>> DisableBiddingSession(Guid id)
         {
             try
@@ -107,25 +127,6 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             {
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
-        }
-
-        public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingSessions(BiddingSessionFilter request)
-        {
-            var result = await _unitOfWork.BiddingSessionRepository.GetAllBiddingSessionsAsync(request);
-
-            // Map the Todo entities to TodoVm ViewModels
-            var resultVmList = _mapper.Map<List<BiddingSessionVm>>(result.BiddingSessions);
-
-            // Create the paging result
-            var pagingResult = new PagingResult<BiddingSessionVm>(request.PageNumber, request.PageSize, result.TotalCount, resultVmList);
-
-            return new ApiResponse<PagingResult<BiddingSessionVm>>
-            {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Bidding sessions fetched successfully",
-                Data = pagingResult
-            };
         }
     }
 }

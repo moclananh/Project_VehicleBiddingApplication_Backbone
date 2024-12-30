@@ -4,6 +4,7 @@ using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Infrastructure.Dtos.BiddingSessionDtos;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
 {
@@ -68,26 +69,23 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
 
         public async Task<BiddingSessionResult> GetAllBiddingSessionsAsync(BiddingSessionFilter request)
         {
-            var totalItemParam = new SqlParameter
-            {
-                ParameterName = "@TotalItem", // Output parameter for total item count
-                SqlDbType = System.Data.SqlDbType.Int,
-                Direction = System.Data.ParameterDirection.Output
-            };
+            var totalItemsParam = new SqlParameter("@TotalItem", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            var itemCountsParam = new SqlParameter("@ItemCount", SqlDbType.Int) { Direction = ParameterDirection.Output };
 
             try
             {
                 // Execute the stored procedure and get the BiddingSessions
                 var biddingSessions = await _dbContext.BiddingSessions
                     .FromSqlRaw(
-                        "EXEC dbo.GetBiddingSessionsWithPaging @PageNumber, @PageSize, @IsActive, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT",
+                        "EXEC dbo.GetBiddingSessionsWithPaging @PageNumber, @PageSize, @IsActive, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
                         new SqlParameter("@PageNumber", request.PageNumber),
                         new SqlParameter("@PageSize", request.PageSize),
                         new SqlParameter("@IsActive", request.IsActive ?? (object)DBNull.Value),
                         new SqlParameter("@StartTime", request.StartTime ?? (object)DBNull.Value),
                         new SqlParameter("@EndTime", request.EndTime ?? (object)DBNull.Value),
                         new SqlParameter("@VIN", request.VIN ?? (object)DBNull.Value),
-                        totalItemParam)
+                        totalItemsParam,
+                        itemCountsParam)
                     .ToListAsync();
 
                 // Map the related entities
@@ -101,14 +99,16 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
                     }
                 }
 
-                // Check if totalItemParam.Value is null
-                int totalCount = totalItemParam.Value != DBNull.Value ? (int)totalItemParam.Value : 0;
+                // Retrieve total count
+                int totalItems = totalItemsParam.Value != DBNull.Value ? (int)totalItemsParam.Value : 0;
+                int itemCounts = itemCountsParam.Value != DBNull.Value ? (int)itemCountsParam.Value : 0;
 
                 // Return both the BiddingSessions and the total count encapsulated in BiddingSessionResult
                 return new BiddingSessionResult
                 {
                     BiddingSessions = biddingSessions,
-                    TotalCount = totalCount
+                    TotalItems = totalItems,
+                    ItemCounts = itemCounts,
                 };
             }
             catch (Exception ex)

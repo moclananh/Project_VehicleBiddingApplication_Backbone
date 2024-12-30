@@ -1,6 +1,10 @@
-﻿using BiddingApp.Domain.Models.EF;
+﻿using BiddingApp.BuildingBlock.Exceptions;
+using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Infrastructure.Dtos.VehicleDtos;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
 {
@@ -13,19 +17,78 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             _dbContext = dbContext;
         }
 
-        public async Task<bool> CreateVehicleAsync(CreateVehicleRequest request)
+        public async Task<string> CreateVehicleAsync(CreateVehicleRequest request)
         {
-            throw new NotImplementedException();
-        }
+            var vinOutParam = new SqlParameter
+            {
+                ParameterName = "@Result",
+                SqlDbType = SqlDbType.NVarChar,
+                Size = 50,
+                Direction = ParameterDirection.Output
+            };
 
-        public async Task<bool> DeleteVehicleAsync(int id)
-        {
-            throw new NotImplementedException();
+            try
+            {
+                // Execute the stored procedure
+                await _dbContext.Database.ExecuteSqlRawAsync(
+                    "EXEC dbo.CreateVehicle @Name, @Description, @Brand, @VIN, @Price, @Color, @ImageUrl, @Result OUTPUT",
+                    new SqlParameter("@Name", request.Name),
+                    new SqlParameter("@Description", request.Desciption),
+                    new SqlParameter("@Brand", request.Brands),
+                    new SqlParameter("@VIN", request.VIN),
+                    new SqlParameter("@Price", request.Price),
+                    new SqlParameter("@Color", request.Color),
+                    new SqlParameter("@ImageUrl", request.ImageUrl),
+                    vinOutParam
+                );
+
+                var result = vinOutParam.Value as string;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the CreateVehicle stored procedure", ex.Message);
+            }
         }
 
         public async Task<VehicleResult> GetAllVehiclesAsync(VehicleFilter request)
         {
-            throw new NotImplementedException();
+            var totalItemsParam = new SqlParameter("@TotalItem", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            var itemCountsParam = new SqlParameter("@ItemCount", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            try
+            {
+                // Execute the stored procedure and fetch the vehicles
+                var vehicles = await _dbContext.Vehicles
+                    .FromSqlRaw(
+                        "EXEC dbo.GetVehiclesWithPaging @PageNumber, @PageSize, @Name, @Brand, @VIN, @Color, @Status, @TotalItem OUTPUT, @ItemCount OUTPUT",
+                        new SqlParameter("@PageNumber", request.PageNumber),
+                        new SqlParameter("@PageSize", request.PageSize),
+                        new SqlParameter("@Name", request.Name ?? (object)DBNull.Value),
+                        new SqlParameter("@Brand", request.Brands ?? (object)DBNull.Value),
+                        new SqlParameter("@VIN", request.VIN ?? (object)DBNull.Value),
+                        new SqlParameter("@Color", request.Color ?? (object)DBNull.Value),
+                        new SqlParameter("@Status", request.Status ?? (object)DBNull.Value),
+                        totalItemsParam,
+                        itemCountsParam
+                    )
+                    .ToListAsync();
+
+                // Retrieve total count
+                int totalItems = totalItemsParam.Value != DBNull.Value ? (int)totalItemsParam.Value : 0;
+                int itemCounts = itemCountsParam.Value != DBNull.Value ? (int)itemCountsParam.Value : 0;
+
+                // Return the result
+                return new VehicleResult
+                {
+                    Vehicles = vehicles,
+                    TotalItems = totalItems,
+                    ItemCounts = itemCounts
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException("Error when calling the GetVehiclesWithPaging stored procedure", ex.Message);
+            }
         }
 
         public async Task<Vehicle> GetVehicleByVINAsync(string vin)
@@ -34,6 +97,11 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
         }
 
         public async Task<bool> UpdateVehicleAsync(int id, UpdateVehicleRequest todoVm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> DeleteVehicleAsync(int id)
         {
             throw new NotImplementedException();
         }

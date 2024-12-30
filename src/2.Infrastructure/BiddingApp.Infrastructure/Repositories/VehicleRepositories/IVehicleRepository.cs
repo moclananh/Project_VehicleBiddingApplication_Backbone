@@ -7,7 +7,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
     {
         Task<VehicleResult> GetAllVehiclesAsync(VehicleFilter request);
         Task<Vehicle> GetVehicleByVINAsync(string vin);
-        Task<bool> CreateVehicleAsync(CreateVehicleRequest request);
+        Task<string> CreateVehicleAsync(CreateVehicleRequest request);
         Task<bool> UpdateVehicleAsync(int id, UpdateVehicleRequest todoVm);
         Task<bool> DeleteVehicleAsync(int id);
     }
