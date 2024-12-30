@@ -22,7 +22,7 @@ namespace BiddingApp.Domain.FluentAPIs
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(b => b.BiddingSession)
-                   .WithMany(bs => bs.Bids)
+                   .WithMany(bs => bs.Biddings)
                    .HasForeignKey(b => b.BiddingSessionId)
                    .OnDelete(DeleteBehavior.Cascade);
         }

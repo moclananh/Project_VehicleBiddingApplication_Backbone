@@ -82,17 +82,30 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
 
         public async Task<ApiResponse<BiddingSessionVm>> GetBiddingSessionById(Guid id)
         {
-            var biddingSessionVm = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(id);
-
-            if (biddingSessionVm is null) throw new NotFoundException("Session not found");
-
-            return new ApiResponse<BiddingSessionVm>
+            try
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Session fetch successfully",
-                Data = biddingSessionVm
-            };
+                var biddingSession = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(id);
+
+                if (biddingSession is null) throw new NotFoundException("Session not found");
+
+                var biddingSessionVm = _mapper.Map<BiddingSessionVm>(biddingSession);
+
+                return new ApiResponse<BiddingSessionVm>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Session fetch successfully",
+                    Data = biddingSessionVm
+                };
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+            }
         }
 
         public Task<ApiResponse<BiddingSessionResult>> GetAllBiddingSessions(BiddingSessionFilter request)

@@ -15,5 +15,4 @@ namespace BiddingApp.Domain.Models.Entities
         public VehicleStatus Status { get; set; }
         public ICollection<BiddingSession> BiddingSessions { get; set; }
     }
-
 }

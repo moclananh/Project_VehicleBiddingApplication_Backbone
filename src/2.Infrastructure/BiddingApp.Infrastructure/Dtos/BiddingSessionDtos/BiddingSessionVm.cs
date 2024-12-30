@@ -9,6 +9,7 @@ namespace BiddingApp.Infrastructure.Dtos.BiddingSessionDtos
         public DateTime EndTime { get; set; }
         public int TotalBiddingCount { get; set; }
         public decimal HighestBidding { get; set; }
+        public decimal MinimumJumpingValue { get; set; }
         public bool IsActive { get; set; }
         public bool IsClosed { get; set; }
         public int VehicleId { get; set; }

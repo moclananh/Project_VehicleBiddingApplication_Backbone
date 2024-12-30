@@ -12,6 +12,6 @@
         public bool IsClosed { get; set; }
         public int VehicleId { get; set; }
         public Vehicle Vehicle { get; set; }
-        public ICollection<Bidding> Bids { get; set; }
+        public ICollection<Bidding> Biddings { get; set; }
     }
 }

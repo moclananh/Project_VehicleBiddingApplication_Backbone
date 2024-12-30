@@ -74,38 +74,25 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
             throw new NotImplementedException();
         }
 
-        public async Task<BiddingSessionVm> GetBiddingSessionByIdAsync(Guid id)
+        public async Task<BiddingSession> GetBiddingSessionByIdAsync(Guid id)
         {
             try
             {
-                var biddingSession = await _dbContext.BiddingSessions
-              .Include(bs => bs.Vehicle)
-              .FirstOrDefaultAsync(bs => bs.Id == id);
+                var biddingSessionResult = await _dbContext.BiddingSessions
+                    .FromSqlRaw("EXEC dbo.GetBiddingSessionById @Id = {0}", id)
+                    .ToListAsync();
 
-                var biddingSessionVm = new BiddingSessionVm
+                var biddingSession = biddingSessionResult.FirstOrDefault();
+
+                if (biddingSession != null)
                 {
-                    Id = biddingSession.Id,
-                    StartTime = biddingSession.StartTime,
-                    EndTime = biddingSession.EndTime,
-                    TotalBiddingCount = biddingSession.TotalBiddingCount,
-                    HighestBidding = biddingSession.HighestBidding,
-                    IsActive = biddingSession.IsActive,
-                    IsClosed = biddingSession.IsClosed,
-                    VehicleId = biddingSession.VehicleId,
-                    Vehicles = new VehicleVm
-                    {
-                        Id = biddingSession.Vehicle.Id,
-                        Name = biddingSession.Vehicle.Name,
-                        Desciption = biddingSession.Vehicle.Desciption,
-                        Brands = biddingSession.Vehicle.Brands,
-                        VIN = biddingSession.Vehicle.VIN,
-                        Price = biddingSession.Vehicle.Price,
-                        Color = biddingSession.Vehicle.Color,
-                        ImageUrl = biddingSession.Vehicle.ImageUrl,
-                        Status = biddingSession.Vehicle.Status
-                    }
-                };
-                return biddingSessionVm;
+                    var vehicleDetails = await _dbContext.Vehicles
+                        .FromSqlRaw("EXEC dbo.GetVehicleById @Id = {0}", biddingSession.VehicleId)
+                        .ToListAsync();
+                    biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
+                }
+
+                return biddingSession;
 
             }
             catch (Exception)

@@ -34,7 +34,7 @@ namespace BiddingApp.Domain.FluentAPIs
                    .HasForeignKey(bs => bs.VehicleId)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(bs => bs.Bids)
+            builder.HasMany(bs => bs.Biddings)
                    .WithOne(b => b.BiddingSession)
                    .HasForeignKey(b => b.BiddingSessionId)
                    .OnDelete(DeleteBehavior.Cascade);
