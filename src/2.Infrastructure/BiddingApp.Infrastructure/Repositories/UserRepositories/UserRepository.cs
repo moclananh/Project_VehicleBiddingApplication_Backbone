@@ -175,7 +175,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
                     .Take(request.PageSize)
                     .Select(x => new UserReportVm
                     {
-                        Id = x.b.Id,
+                        BiddingId = x.b.Id,
                         UserCurrentBiddingValue = x.b.UserCurrentBidding,
                         IsWinner = x.b.IsWinner,
                         SessionId = x.bs.Id,

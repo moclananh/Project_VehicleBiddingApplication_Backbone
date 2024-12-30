@@ -13,27 +13,27 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             _dbContext = dbContext;
         }
 
-        public Task<bool> CreateVehicleAsync(CreateVehicleRequest request)
+        public async Task<bool> CreateVehicleAsync(CreateVehicleRequest request)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteVehicleAsync(int id)
+        public async Task<bool> DeleteVehicleAsync(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<VehicleResult> GetAllTodosAsync(VehicleFilter request)
+        public async Task<VehicleResult> GetAllVehiclesAsync(VehicleFilter request)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Vehicle> GetVehicleByVINAsync(string vin)
+        public async Task<Vehicle> GetVehicleByVINAsync(string vin)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateVehicleAsync(int id, UpdateVehicleRequest todoVm)
+        public async Task<bool> UpdateVehicleAsync(int id, UpdateVehicleRequest todoVm)
         {
             throw new NotImplementedException();
         }

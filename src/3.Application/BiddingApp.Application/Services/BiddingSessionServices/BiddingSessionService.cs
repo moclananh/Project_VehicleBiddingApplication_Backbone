@@ -4,6 +4,7 @@ using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.BiddingSessionDtos;
+using BiddingApp.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -108,9 +109,23 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             }
         }
 
-        public Task<ApiResponse<BiddingSessionResult>> GetAllBiddingSessions(BiddingSessionFilter request)
+        public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingSessions(BiddingSessionFilter request)
         {
-            throw new NotImplementedException();
+            var result = await _unitOfWork.BiddingSessionRepository.GetAllBiddingSessionsAsync(request);
+
+            // Map the Todo entities to TodoVm ViewModels
+            var resultVmList = _mapper.Map<List<BiddingSessionVm>>(result.BiddingSessions);
+
+            // Create the paging result
+            var pagingResult = new PagingResult<BiddingSessionVm>(request.PageNumber, request.PageSize, result.TotalCount, resultVmList);
+
+            return new ApiResponse<PagingResult<BiddingSessionVm>>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Bidding sessions fetched successfully",
+                Data = pagingResult
+            };
         }
     }
 }

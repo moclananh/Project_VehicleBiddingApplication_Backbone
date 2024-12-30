@@ -2,7 +2,7 @@
 {
     public class UserReportVm
     {
-        public int Id { get; set; }
+        public int BiddingId { get; set; }
         public decimal UserCurrentBiddingValue { get; set; }
         public bool IsWinner { get; set; }
         public Guid SessionId { get; set; }

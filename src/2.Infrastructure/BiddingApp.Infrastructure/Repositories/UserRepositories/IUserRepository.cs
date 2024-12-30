@@ -9,6 +9,6 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
         Task<AuthenticateResponse> AuthenticateUser(LoginVm request);
         Task<int> RegisterUser(RegisterVm request);
         Task<User> GetUserByIdAsync (Guid id); //call for check budget
-        Task<UserReportResult> GetUserReportAsync(Guid id, UserReportFilter request);
+        Task<UserReportResult> GetUserReportAsync(Guid id, UserReportFilter request); //using linq & lambda <need to implement store procedure>
     }
 }

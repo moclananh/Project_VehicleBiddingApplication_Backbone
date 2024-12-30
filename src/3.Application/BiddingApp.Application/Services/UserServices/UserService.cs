@@ -1,9 +1,10 @@
-﻿using BiddingApp.BuildingBlock.Exceptions;
+﻿using AutoMapper;
+using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.BuildingBlock.Utilities;
-using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Domain.Models;
-using BiddingApp.Infrastructure.Dtos.UserDtos;
+using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Infrastructure;
+using BiddingApp.Infrastructure.Dtos.UserDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -11,8 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using AutoMapper;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BiddingApp.Application.Services.UserServices
 {
@@ -144,7 +143,7 @@ namespace BiddingApp.Application.Services.UserServices
                     StatusCode = StatusCodes.Status404NotFound,
                 };
             }
-          
+
             return new ApiResponse<UserReportResult>
             {
                 IsSuccess = true,
