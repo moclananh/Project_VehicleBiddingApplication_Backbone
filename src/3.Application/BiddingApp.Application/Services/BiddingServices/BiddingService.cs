@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using BiddingApp.Application.SignalR;
+using BiddingApp.Application.SignalRServices;
 using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.BiddingDtos;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace BiddingApp.Application.Services.BiddingServices
@@ -15,14 +14,19 @@ namespace BiddingApp.Application.Services.BiddingServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<UnitOfWork> _logger;
-        private readonly IHubContext<BiddingHub> _hubContext;
-        public BiddingService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UnitOfWork> logger, IHubContext<BiddingHub> hubContext)
+        private readonly ILogger<BiddingService> _logger;
+        private readonly IBiddingNotificationService _notificationService;
+
+        public BiddingService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            ILogger<BiddingService> logger,
+            IBiddingNotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
-            _hubContext = hubContext;
+            _notificationService = notificationService;
         }
 
         public async Task<ApiResponse<bool>> CreateBidding(CreateBiddingRequest request)
@@ -67,8 +71,7 @@ namespace BiddingApp.Application.Services.BiddingServices
                 }
 
                 //check bidding exist
-                var checkBiddingExist = await _unitOfWork.BidRepository.GetBiddingListByBiddingSessionIdAsync(request.BiddingSessionId);
-                if (checkBiddingExist.Count > 0)
+                if (session.TotalBiddingCount > 0)
                 {
                     //upadte state
                     var fetchUserState = await _unitOfWork.BidRepository.UpdateUserStateAsync(request.BiddingSessionId);
@@ -82,15 +85,11 @@ namespace BiddingApp.Application.Services.BiddingServices
                 // Call the repository to create the bidding session
                 await _unitOfWork.BidRepository.CreateBiddingRequestAsync(request);
 
-                // Broadcast the new bid to all clients in the session
-                await _hubContext.Clients.Group(request.BiddingSessionId.ToString())
-                 .SendAsync("ReceiveBid", new
-                 {
-                     UserId = request.UserId,
-                     BiddingSessionId = request.BiddingSessionId,
-                     UserCurrentBidding = request.UserCurrentBidding,
-                     TotalBiddingCount = session.TotalBiddingCount + 1
-                 });
+                // Broadcast the new bid using the notification service
+                await _notificationService.NotifyBiddingUpdateAsync(
+                    request.BiddingSessionId,
+                    request.UserId,
+                    request.UserCurrentBidding);
 
                 return new ApiResponse<bool>
                 {

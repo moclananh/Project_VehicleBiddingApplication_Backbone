@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\2.Infrastructure\BiddingApp.BuildingBlock\BiddingApp.BuildingBlock.csproj" />
     <ProjectReference Include="..\..\2.Infrastructure\BiddingApp.Infrastructure\BiddingApp.Infrastructure.csproj" />
   </ItemGroup>

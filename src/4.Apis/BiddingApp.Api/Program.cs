@@ -1,7 +1,9 @@
-using BiddingApp.Application.Services.BiddingSessionServices;
+using BiddingApp.Application.Hubs;
 using BiddingApp.Application.Services.BiddingServices;
+using BiddingApp.Application.Services.BiddingSessionServices;
 using BiddingApp.Application.Services.UserServices;
 using BiddingApp.Application.Services.VehicleSevices;
+using BiddingApp.Application.SignalRServices;
 using BiddingApp.BuildingBlock.Exceptions.Handler;
 using BiddingApp.Domain.Models;
 using BiddingApp.Domain.Models.EF;
@@ -11,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using BiddingApp.Application.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IBiddingService, BiddingService>();
 builder.Services.AddScoped<IBiddingSessionService, BiddingSessionService>();
+//register DI for signalr
+builder.Services.AddScoped<IBiddingNotificationService, BiddingNotificationService>();
 
 // Register logging services (ILogger is already available)
 builder.Services.AddLogging();
@@ -147,6 +150,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<BiddingHub>("/biddingHub");
+app.MapHub<BiddingHub>("/hubs/bidding");
 
 app.Run();
