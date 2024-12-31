@@ -49,16 +49,15 @@ namespace BiddingApp.Application.Services.UserServices
                 throw new BadRequestException(SystemConstants.AuthenticateResponses.IncorrectPassword);
             }
 
+            var userVm = _mapper.Map<UserVm>(authResponse.User);
             // If authentication is successful, return login response
             return new LoginResponse
             {
                 IsSuccess = true,
                 Message = SystemConstants.AuthenticateResponses.UserAuthenticated,
                 StatusCode = StatusCodes.Status200OK,
-                Id = authResponse.User.Id,
-                UserName = authResponse.User.Username,
-                Email = authResponse.User.Email,
-                Data = GenerateToken(authResponse.User)
+                Data = GenerateToken(authResponse.User),
+                Users = userVm
             };
         }
 

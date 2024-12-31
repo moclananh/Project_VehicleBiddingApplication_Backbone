@@ -60,7 +60,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
                     Username = (string)parameters.First(p => p.ParameterName == "@UserName").Value!,
                     Email = (string)parameters.First(p => p.ParameterName == "@EmailOut").Value!,
                     Role = (Domain.Models.Enums.UserRole)parameters.First(p => p.ParameterName == "@Role").Value!,
-                   // Budget = (decimal)parameters.First(p => p.ParameterName == "@Budget").Value!,
+                    Budget = (decimal)parameters.First(p => p.ParameterName == "@Budget").Value!,
                     Password = (string)parameters.First(p => p.ParameterName == "@HashedPassword").Value!,
                 };
 
