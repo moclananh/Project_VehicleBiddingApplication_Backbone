@@ -73,7 +73,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error in call store procedure, Error: ", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -82,14 +82,14 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
             try
             {
                 var user = await _dbContext.Users
-                    .FromSqlRaw("EXEC dbo.GetUserById @Id = {0}", id) // Use parameterized query
+                    .FromSqlRaw("EXEC dbo.GetUserById @Id = {0}", id)
                     .ToListAsync();
 
                 return user.FirstOrDefault();
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error when calling stored procedure. Error: " + ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -121,7 +121,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error in call store procedure, Error: ", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -197,7 +197,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
             }
             catch (Exception ex)
             {
-                throw new BadRequestException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
     }

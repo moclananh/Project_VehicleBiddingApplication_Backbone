@@ -36,7 +36,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingRepositories
             }
             catch (Exception ex)
             {
-                throw new BadRequestException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -53,7 +53,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingRepositories
             }
             catch (Exception ex)
             {
-                throw new BadRequestException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -68,7 +68,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingRepositories
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error when updating user state.", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
     }

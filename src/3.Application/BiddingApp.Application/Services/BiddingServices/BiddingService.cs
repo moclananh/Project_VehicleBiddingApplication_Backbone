@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BiddingApp.Application.SignalRServices;
+﻿using BiddingApp.Application.SignalRServices;
 using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
@@ -13,18 +12,15 @@ namespace BiddingApp.Application.Services.BiddingServices
     public class BiddingService : IBiddingService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly ILogger<BiddingService> _logger;
         private readonly IBiddingNotificationService _notificationService;
 
         public BiddingService(
             IUnitOfWork unitOfWork,
-            IMapper mapper,
             ILogger<BiddingService> logger,
             IBiddingNotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _logger = logger;
             _notificationService = notificationService;
         }
@@ -35,14 +31,17 @@ namespace BiddingApp.Application.Services.BiddingServices
             {
                 //check bidding session is valid
                 var session = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(request.BiddingSessionId);
-                if (session is null) throw new NotFoundException("Bidding session not found");
+                if (session is null) {
+                    _logger.LogError(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
+                    throw new NotFoundException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound); 
+                }
                 if (session.IsClosed)
                 {
                     return new ApiResponse<bool>
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Bidding session was closed"
+                        Message = SystemConstants.BiddingSessionMessageResponses.BiddingSessionClosed
                     };
                 }
 
@@ -53,20 +52,24 @@ namespace BiddingApp.Application.Services.BiddingServices
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Bidding value must be greater than current value"
+                        Message = SystemConstants.BiddingMessageResponses.BiddingNotValid
                     };
                 }
 
                 //check user budget is available
                 var user = await _unitOfWork.UserRepository.GetUserByIdAsync(request.UserId);
-                if (user is null) throw new NotFoundException(SystemConstants.AuthenticateResponses.UserChecked);
+                if (user is null)
+                {
+                    _logger.LogError(SystemConstants.AuthenticateResponses.UserNotExist);
+                    throw new NotFoundException(SystemConstants.AuthenticateResponses.UserNotExist);
+                }
                 if (user.Budget < request.UserCurrentBidding)
                 {
                     return new ApiResponse<bool>
                     {
                         IsSuccess = false,
                         StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Budget not available to bid"
+                        Message = SystemConstants.AuthenticateResponses.UserBudgetCheck
                     };
                 }
 
@@ -75,12 +78,20 @@ namespace BiddingApp.Application.Services.BiddingServices
                 {
                     //upadte state
                     var fetchUserState = await _unitOfWork.BidRepository.UpdateUserStateAsync(request.BiddingSessionId);
-                    if (!fetchUserState) throw new BadRequestException("Fetch state failed");
+                    if (!fetchUserState)
+                    {
+                        _logger.LogError(SystemConstants.CommonResponse.FetchFailed);
+                        throw new BadRequestException(SystemConstants.CommonResponse.FetchFailed);
+                    }
                 }
 
                 //update highest price & count total bidding
                 var fetchHighestBiddingValue = await _unitOfWork.BiddingSessionRepository.FetchBiddingAsync(request.BiddingSessionId, request.UserCurrentBidding);
-                if (!fetchHighestBiddingValue) throw new BadRequestException("Fetch highest bidding value failied");
+                if (!fetchHighestBiddingValue)
+                {
+                    _logger.LogError(SystemConstants.CommonResponse.FetchFailed);
+                    throw new BadRequestException(SystemConstants.CommonResponse.FetchFailed);
+                }    
 
                 // Call the repository to create the bidding session
                 await _unitOfWork.BidRepository.CreateBiddingRequestAsync(request);
@@ -98,9 +109,17 @@ namespace BiddingApp.Application.Services.BiddingServices
                     Message = SystemConstants.BiddingMessageResponses.BiddingCreated
                 };
             }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch(BadRequestException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
-                // Log exception or handle as necessary
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }

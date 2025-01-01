@@ -1,4 +1,5 @@
 ﻿using BiddingApp.BuildingBlock.Exceptions;
+using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Infrastructure.Dtos.BiddingSessionDtos;
@@ -40,7 +41,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error creating a new bidding session.", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -63,7 +64,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error when updating highest bidding value.", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -91,7 +92,8 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
                 // Map the related entities
                 if (biddingSessions != null)
                 {
-                    foreach (var biddingSession in  biddingSessions) {
+                    foreach (var biddingSession in biddingSessions)
+                    {
                         var vehicleDetails = await _dbContext.Vehicles
                             .FromSqlRaw("EXEC dbo.GetVehicleById @Id = {0}", biddingSession.VehicleId)
                             .ToListAsync();
@@ -113,7 +115,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error occurred while fetching BiddingSessions", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -138,9 +140,9 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
                 return biddingSession;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new InternalServerException("Error when called store procedure");
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -158,7 +160,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error when closing bidding session.", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -176,7 +178,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Error when closing bidding session.", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
     }
