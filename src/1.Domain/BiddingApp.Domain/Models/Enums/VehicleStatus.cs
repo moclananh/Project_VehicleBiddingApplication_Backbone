@@ -5,6 +5,6 @@
         Available,
         InBidding,
         Sold,
-        NotAvailable
+        UnAvailable
     }
 }
