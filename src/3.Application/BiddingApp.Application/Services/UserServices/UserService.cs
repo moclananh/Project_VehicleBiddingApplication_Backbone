@@ -67,7 +67,7 @@ namespace BiddingApp.Application.Services.UserServices
                     UserName = userVm.UserName,
                     Email = userVm.Email,
                     Budget = userVm.Budget,
-                    Role = userVm.Role,
+                    Role = userVm.Role.ToString(),
                     Token = token
                 }
             };

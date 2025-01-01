@@ -10,7 +10,7 @@ namespace BiddingApp.Infrastructure.Dtos.UserDtos
         [EmailAddress]
         public string Email { get; set; }
         public string Password { get; set; }
-        public int Role { get; set; } // Admin, Customer
+        public string Role { get; set; } // Admin, Customer
         public decimal Budget { get; set; }
     }
 }

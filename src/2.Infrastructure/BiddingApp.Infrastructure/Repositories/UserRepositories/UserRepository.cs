@@ -2,6 +2,7 @@
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
+using BiddingApp.Domain.Models.Enums;
 using BiddingApp.Infrastructure.Dtos.UserDtos;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
@@ -95,6 +96,11 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
 
         public async Task<int> RegisterUser(RegisterVm request)
         {
+            // Convert the role string to an integer
+            if (!Enum.TryParse<UserRole>(request.Role, true, out var userRole))
+            {
+                throw new BadRequestException($"Invalid role: {request.Role}");
+            }
             // Hash the password before storing it
             var passwordHasher = new PasswordHasher<RegisterVm>();
             var hashedPassword = passwordHasher.HashPassword(request, request.Password);
@@ -105,7 +111,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
                 new SqlParameter("@UserName", request.UserName),
                 new SqlParameter("@Email", request.Email),
                 new SqlParameter("@Password", hashedPassword),
-                new SqlParameter("@Role", request.Role),
+                new SqlParameter("@Role",(int)userRole),
                 new SqlParameter("@Budget", request.Budget),
                 new SqlParameter("@Result", SqlDbType.Int) { Direction = ParameterDirection.Output }
             };
@@ -118,6 +124,10 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
 
                 // Return the result from output parameters
                 return (int)parameters.First(p => p.ParameterName == "@Result").Value!;
+            }
+            catch (BadRequestException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
