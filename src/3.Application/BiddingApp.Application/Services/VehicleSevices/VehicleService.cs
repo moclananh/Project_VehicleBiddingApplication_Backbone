@@ -165,7 +165,7 @@ namespace BiddingApp.Application.Services.VehicleSevices
                 // check vehicle valid
                 var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(id);
                 if (vehicle is null) throw new NotFoundException(SystemConstants.VehicleMessageResponses.VehicleNotFound);
-                if (vehicle.Status != VehicleStatus.NotAvailable) throw new BadRequestException(SystemConstants.VehicleMessageResponses.VehicleGuard);
+                if (vehicle.Status != VehicleStatus.UnAvailable) throw new BadRequestException(SystemConstants.VehicleMessageResponses.VehicleGuard);
                 
                 await _unitOfWork.BeginTransactionAsync();
                 await _unitOfWork.VehicleRepository.DeleteVehicleAsync(id);
