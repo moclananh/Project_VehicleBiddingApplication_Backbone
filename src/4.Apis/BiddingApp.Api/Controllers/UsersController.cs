@@ -16,7 +16,7 @@ namespace BiddingApp.Api.Controllers
             _userService = userService;
         }
 
-        [HttpPost("Authenticate")]
+        [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Login([FromBody] LoginVm request)
@@ -35,7 +35,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterVm request)

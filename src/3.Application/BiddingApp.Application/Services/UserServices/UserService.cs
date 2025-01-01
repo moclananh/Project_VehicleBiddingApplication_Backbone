@@ -31,7 +31,7 @@ namespace BiddingApp.Application.Services.UserServices
             _logger = logger;
         }
 
-        public async Task<LoginResponse> Authencate(LoginVm request)
+        public async Task<ApiResponse<LoginResponse>> Authencate(LoginVm request)
         {
             var authResponse = await _unitOfWork.UserRepository.AuthenticateUser(request);
 
@@ -54,14 +54,22 @@ namespace BiddingApp.Application.Services.UserServices
             }
 
             var userVm = _mapper.Map<UserVm>(authResponse.User);
+            var token = GenerateToken(authResponse.User);
             // If authentication is successful, return login response
-            return new LoginResponse
+            return new ApiResponse<LoginResponse>
             {
                 IsSuccess = true,
                 Message = SystemConstants.AuthenticateResponses.UserAuthenticated,
                 StatusCode = StatusCodes.Status200OK,
-                Data = GenerateToken(authResponse.User),
-                Users = userVm
+                Data = new LoginResponse
+                {
+                    Id = userVm.Id,
+                    UserName = userVm.UserName,
+                    Email = userVm.Email,
+                    Budget = userVm.Budget,
+                    Role = userVm.Role,
+                    Token = token
+                }
             };
         }
 

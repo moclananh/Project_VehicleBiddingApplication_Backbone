@@ -16,7 +16,7 @@ namespace BiddingApp.Api.Controllers
             _biddingSessionService = biddingSessionService;
         }
 
-        [HttpPost]
+        [HttpPost("/api/session")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateBiddingSession([FromBody] CreateBiddingSessionRequest request)
@@ -34,7 +34,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
+        [HttpGet("/api/session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllBiddingSession([FromQuery] BiddingSessionFilter request) //Admin role == admin ? (request.IsActive = null) : true
@@ -53,7 +53,7 @@ namespace BiddingApp.Api.Controllers
         }
 
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("/api/session{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetBiddingSessionById(Guid id)
@@ -71,7 +71,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut("close-bidding-session/{id:guid}")]
+        [HttpPut("/api/session/close-bidding-session/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CloseBiddingSession(Guid id)  //called when end session (this is manual option)
@@ -89,7 +89,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut("disable-bidding-session/{id:guid}")]
+        [HttpPut("/api/session/disable-bidding-session/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DisableBiddingSession(Guid id)
