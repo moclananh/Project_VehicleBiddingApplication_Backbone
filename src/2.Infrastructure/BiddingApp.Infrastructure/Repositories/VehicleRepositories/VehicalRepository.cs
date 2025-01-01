@@ -1,5 +1,5 @@
 ﻿using BiddingApp.BuildingBlock.Exceptions;
-using BiddingApp.Domain.Models;
+using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Domain.Models.Enums;
@@ -49,7 +49,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             }
             catch (Exception ex)
             {
-                throw new InternalServerException("Error when calling the CreateVehicle stored procedure", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -89,7 +89,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             }
             catch (Exception ex)
             {
-                throw new InternalServerException("Error when calling the GetVehiclesWithPaging stored procedure", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -106,7 +106,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             }
             catch (Exception ex)
             {
-                throw new InternalServerException("Error when calling the GetVehicleByVIN stored procedure", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -130,7 +130,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             }
             catch (Exception ex)
             {
-                throw new InternalServerException("Error when calling the UpdateVehicle stored procedure", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -163,7 +163,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             }
             catch (Exception ex)
             {
-                throw new InternalServerException("Error when calling the GetVehicleByVIN stored procedure", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
 
@@ -181,7 +181,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             }
             catch (Exception ex)
             {
-                throw new InternalServerException("Error when calling the GetVehicleByVIN stored procedure", ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
     }

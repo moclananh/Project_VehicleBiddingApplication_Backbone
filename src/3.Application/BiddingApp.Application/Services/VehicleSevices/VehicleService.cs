@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BiddingApp.BuildingBlock.Exceptions;
+using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Domain.Models.Enums;
 using BiddingApp.Infrastructure;
@@ -14,8 +15,8 @@ namespace BiddingApp.Application.Services.VehicleSevices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<UnitOfWork> _logger;
-        public VehicleService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UnitOfWork> logger)
+        private readonly ILogger<VehicleService> _logger;
+        public VehicleService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<VehicleService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -28,43 +29,53 @@ namespace BiddingApp.Application.Services.VehicleSevices
             {
                 var vin = await _unitOfWork.VehicleRepository.CreateVehicleAsync(request);
 
-                if (vin is null) throw new BadRequestException("VIN Number already eixisted");
+                if (vin is null) throw new BadRequestException(SystemConstants.VehicleMessageResponses.VINExisted);
 
                 return new ApiResponse<string>
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Vehicle created successfully",
+                    Message = SystemConstants.CommonResponse.CreateSuccess,
                     Data = vin
                 };
             }
             catch (BadRequestException)
             {
+                _logger.LogError(SystemConstants.VehicleMessageResponses.VINExisted);
                 throw;
             }
             catch (Exception ex)
             {
-                throw new BadRequestException("Create failed.", ex.Message);
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
 
         public async Task<ApiResponse<PagingResult<VehicleVm>>> GetAllVehicles(VehicleFilter request)
         {
-            var result = await _unitOfWork.VehicleRepository.GetAllVehiclesAsync(request);
-
-            // Map the Todo entities to TodoVm ViewModels
-            var resultVmList = _mapper.Map<List<VehicleVm>>(result.Vehicles);
-
-            // Create the paging result
-            var pagingResult = new PagingResult<VehicleVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
-
-            return new ApiResponse<PagingResult<VehicleVm>>
+            try
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Vehicle fetched successfully",
-                Data = pagingResult
-            };
+                var result = await _unitOfWork.VehicleRepository.GetAllVehiclesAsync(request);
+
+                // Map the Todo entities to TodoVm ViewModels
+                var resultVmList = _mapper.Map<List<VehicleVm>>(result.Vehicles);
+
+                // Create the paging result
+                var pagingResult = new PagingResult<VehicleVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
+
+                return new ApiResponse<PagingResult<VehicleVm>>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
+                    Data = pagingResult
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+            }
         }
 
         public async Task<ApiResponse<VehicleVm>> GetVehicleByVin(string vin)
@@ -78,7 +89,7 @@ namespace BiddingApp.Application.Services.VehicleSevices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Vehicle fetched successfully",
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
                     Data = vehicleVm
                 };
             }
@@ -86,9 +97,10 @@ namespace BiddingApp.Application.Services.VehicleSevices
             {
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new InternalServerException("Error from server");
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
 
@@ -103,7 +115,7 @@ namespace BiddingApp.Application.Services.VehicleSevices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Vehicle fetched successfully",
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
                     Data = vehicleVm
                 };
             }
@@ -111,9 +123,10 @@ namespace BiddingApp.Application.Services.VehicleSevices
             {
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new InternalServerException("Error from server");
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
 
@@ -123,7 +136,7 @@ namespace BiddingApp.Application.Services.VehicleSevices
             {
                 await _unitOfWork.BeginTransactionAsync();
                 var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(id);
-                if (vehicle is null) throw new NotFoundException("Vehicle not found");
+                if (vehicle is null) throw new NotFoundException(SystemConstants.VehicleMessageResponses.VehicleNotFound);
                 await _unitOfWork.VehicleRepository.UpdateVehicleAsync(id, request);
                 await _unitOfWork.CommitTransactionAsync();
                 return new ApiResponse<bool>
@@ -135,11 +148,13 @@ namespace BiddingApp.Application.Services.VehicleSevices
             }
             catch (NotFoundException)
             {
+                _logger.LogError(SystemConstants.VehicleMessageResponses.VehicleNotFound);
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new InternalServerException("Error from server");
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
 
@@ -149,8 +164,8 @@ namespace BiddingApp.Application.Services.VehicleSevices
             {
                 // check vehicle valid
                 var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(id);
-                if (vehicle is null) throw new NotFoundException("Vehicle does not exist");
-                if (vehicle.Status != VehicleStatus.NotAvailable) throw new BadRequestException("System just allow for delete the vehicle with status is 'not available' only");
+                if (vehicle is null) throw new NotFoundException(SystemConstants.VehicleMessageResponses.VehicleNotFound);
+                if (vehicle.Status != VehicleStatus.NotAvailable) throw new BadRequestException(SystemConstants.VehicleMessageResponses.VehicleGuard);
                 
                 await _unitOfWork.BeginTransactionAsync();
                 await _unitOfWork.VehicleRepository.DeleteVehicleAsync(id);
@@ -159,20 +174,23 @@ namespace BiddingApp.Application.Services.VehicleSevices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Vehicle Deleted sucessfully"
+                    Message = SystemConstants.CommonResponse.DeleteSuccess
                 };
             }
             catch (BadRequestException)
             {
+                _logger.LogError(SystemConstants.VehicleMessageResponses.VehicleGuard);
                 throw;
             }
             catch (NotFoundException)
             {
+                _logger.LogError(SystemConstants.VehicleMessageResponses.VehicleNotFound);
                 throw;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new InternalServerException("Error from server");
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
     }

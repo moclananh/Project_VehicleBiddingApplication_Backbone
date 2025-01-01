@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
@@ -16,8 +15,8 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<UnitOfWork> _logger;
-        public BiddingSessionService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<UnitOfWork> logger)
+        private readonly ILogger<BiddingSessionService> _logger;
+        public BiddingSessionService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<BiddingSessionService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -30,8 +29,8 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             {
                 // Check vehicle is available
                 var vehicle = await _unitOfWork.VehicleRepository.GetVehicleByIdAsync(request.VehicleId);
-                if (vehicle is null) throw new NotFoundException("Vehicle not exist");
-                if (vehicle.Status != VehicleStatus.Available) throw new BadRequestException("Can not create new bidding session, vehicle is not available");
+                if (vehicle is null) throw new NotFoundException(SystemConstants.VehicleMessageResponses.VehicleNotFound);
+                if (vehicle.Status != VehicleStatus.Available) throw new BadRequestException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionCreateFailed);
 
                 // Call the repository to create the bidding session
                 await _unitOfWork.BiddingSessionRepository.CreateBiddingSessionAsync(request);
@@ -43,20 +42,22 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status201Created,
-                    Message = SystemConstants.BiddingSessionMessageResponses.BiddingSessionCreated
+                    Message = SystemConstants.CommonResponse.CreateSuccess
                 };
             }
             catch (NotFoundException)
             {
+                _logger.LogError(SystemConstants.VehicleMessageResponses.VehicleNotFound);
                 throw;
             }
             catch (BadRequestException)
             {
+                _logger.LogError(SystemConstants.BiddingSessionMessageResponses.BiddingSessionCreateFailed);
                 throw;
             }
             catch (Exception ex)
             {
-                // Log exception or handle as necessary
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
@@ -64,21 +65,29 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
 
         public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingSessions(BiddingSessionFilter request)
         {
-            var result = await _unitOfWork.BiddingSessionRepository.GetAllBiddingSessionsAsync(request);
-
-            // Map the Todo entities to TodoVm ViewModels
-            var resultVmList = _mapper.Map<List<BiddingSessionVm>>(result.BiddingSessions);
-
-            // Create the paging result
-            var pagingResult = new PagingResult<BiddingSessionVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
-
-            return new ApiResponse<PagingResult<BiddingSessionVm>>
+            try
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Bidding sessions fetched successfully",
-                Data = pagingResult
-            };
+                var result = await _unitOfWork.BiddingSessionRepository.GetAllBiddingSessionsAsync(request);
+
+                // Map the Todo entities to TodoVm ViewModels
+                var resultVmList = _mapper.Map<List<BiddingSessionVm>>(result.BiddingSessions);
+
+                // Create the paging result
+                var pagingResult = new PagingResult<BiddingSessionVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
+
+                return new ApiResponse<PagingResult<BiddingSessionVm>>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
+                    Data = pagingResult
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+            }
         }
 
         public async Task<ApiResponse<bool>> DisableBiddingSession(Guid id)
@@ -91,11 +100,12 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = SystemConstants.BiddingSessionMessageResponses.BiddingSessionUpdated
+                    Message = SystemConstants.CommonResponse.UpdateSuccess
                 };
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
@@ -106,7 +116,7 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             {
 
                 var session = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(id);
-                if (session is null) throw new NotFoundException("Session not found");
+                if (session is null) throw new NotFoundException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
 
                 await _unitOfWork.BiddingSessionRepository.CloseBiddingSessionAsync(id);
 
@@ -119,16 +129,18 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = SystemConstants.BiddingSessionMessageResponses.BiddingSessionUpdated
+                    Message = SystemConstants.CommonResponse.UpdateSuccess
                 };
             }
 
             catch (NotFoundException)
             {
+                _logger.LogError(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
                 throw;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
@@ -139,7 +151,7 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             {
                 var biddingSession = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(id);
 
-                if (biddingSession is null) throw new NotFoundException("Session not found");
+                if (biddingSession is null) throw new NotFoundException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
 
                 var biddingSessionVm = _mapper.Map<BiddingSessionVm>(biddingSession);
 
@@ -147,16 +159,18 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Session fetch successfully",
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
                     Data = biddingSessionVm
                 };
             }
             catch (NotFoundException)
             {
+                _logger.LogError(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
                 throw;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }

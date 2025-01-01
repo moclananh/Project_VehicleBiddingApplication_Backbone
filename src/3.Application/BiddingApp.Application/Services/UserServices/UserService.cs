@@ -7,6 +7,7 @@ using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.UserDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -21,12 +22,13 @@ namespace BiddingApp.Application.Services.UserServices
         private readonly AppSetting _app;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
-        public UserService(IUnitOfWork unitOfWork, IOptions<AppSetting> appOptions, IMapper mapper)
+        private readonly ILogger<UserService> _logger;
+        public UserService(IUnitOfWork unitOfWork, IOptions<AppSetting> appOptions, IMapper mapper, ILogger<UserService> logger)
         {
             _unitOfWork = unitOfWork;
             _app = appOptions.Value;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<LoginResponse> Authencate(LoginVm request)
@@ -36,7 +38,8 @@ namespace BiddingApp.Application.Services.UserServices
             // Handle user not found case
             if (authResponse.Result == -1 || authResponse.User == null)
             {
-                throw new NotFoundException("UserNotFound");
+                _logger.LogCritical(SystemConstants.AuthenticateResponses.UserNotExist);
+                throw new NotFoundException(SystemConstants.AuthenticateResponses.UserNotExist);
             }
 
             // Password verification using PasswordHasher
@@ -46,19 +49,19 @@ namespace BiddingApp.Application.Services.UserServices
             // If the password verification fails, throw exception
             if (verificationResult == PasswordVerificationResult.Failed)
             {
+                _logger.LogCritical(SystemConstants.AuthenticateResponses.IncorrectPassword);
                 throw new BadRequestException(SystemConstants.AuthenticateResponses.IncorrectPassword);
             }
 
+            var userVm = _mapper.Map<UserVm>(authResponse.User);
             // If authentication is successful, return login response
             return new LoginResponse
             {
                 IsSuccess = true,
                 Message = SystemConstants.AuthenticateResponses.UserAuthenticated,
                 StatusCode = StatusCodes.Status200OK,
-                Id = authResponse.User.Id,
-                UserName = authResponse.User.Username,
-                Email = authResponse.User.Email,
-                Data = GenerateToken(authResponse.User)
+                Data = GenerateToken(authResponse.User),
+                Users = userVm
             };
         }
 
@@ -70,14 +73,15 @@ namespace BiddingApp.Application.Services.UserServices
             // If user is not found, throw an exception
             if (user == null)
             {
-                throw new NotFoundException($"User with ID {id} not found.");
+                _logger.LogCritical(SystemConstants.AuthenticateResponses.UserNotExist);
+                throw new NotFoundException(SystemConstants.AuthenticateResponses.UserNotExist);
             }
             var userVm = _mapper.Map<UserVm>(user);
 
             return new ApiResponse<UserVm>
             {
                 IsSuccess = true,
-                Message = "User retrieved successfully.",
+                Message = SystemConstants.CommonResponse.FetchSuccess,
                 StatusCode = StatusCodes.Status200OK,
                 Data = userVm
             };
@@ -139,7 +143,7 @@ namespace BiddingApp.Application.Services.UserServices
                 return new ApiResponse<UserReportResult>
                 {
                     IsSuccess = true,
-                    Message = "No data bidding.",
+                    Message = SystemConstants.CommonResponse.NoData,
                     StatusCode = StatusCodes.Status404NotFound,
                 };
             }
@@ -147,7 +151,7 @@ namespace BiddingApp.Application.Services.UserServices
             return new ApiResponse<UserReportResult>
             {
                 IsSuccess = true,
-                Message = "User retrieved successfully.",
+                Message = SystemConstants.CommonResponse.FetchSuccess,
                 StatusCode = StatusCodes.Status200OK,
                 Data = result
             };

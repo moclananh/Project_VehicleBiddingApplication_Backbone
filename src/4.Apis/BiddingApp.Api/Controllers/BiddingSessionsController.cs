@@ -74,7 +74,7 @@ namespace BiddingApp.Api.Controllers
         [HttpPut("close-bidding-session/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> CloseBiddingSession(Guid id)
+        public async Task<IActionResult> CloseBiddingSession(Guid id)  //called when end session (this is manual option)
         {
             if (!ModelState.IsValid)
             {
