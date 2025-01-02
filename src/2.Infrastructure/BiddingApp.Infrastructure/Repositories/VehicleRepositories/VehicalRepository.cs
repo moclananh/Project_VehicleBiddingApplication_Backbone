@@ -33,14 +33,18 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             {
                 // Execute the stored procedure
                 await _dbContext.Database.ExecuteSqlRawAsync(
-                    "EXEC dbo.CreateVehicle @Name, @Description, @Brand, @VIN, @Price, @Color, @ImageUrl, @Result OUTPUT",
+                    "EXEC dbo.CreateVehicle @Name, @Description, @Brand, @VIN, @Price, @Color, @ImageUrl, @NumberOfChairs, @Horsepower, @MaximumSpeed, @TrunkCapacity,  @Result OUTPUT",
                     new SqlParameter("@Name", request.Name),
-                    new SqlParameter("@Description", request.Desciption),
+                    new SqlParameter("@Description", request.Description),
                     new SqlParameter("@Brand", request.Brands),
                     new SqlParameter("@VIN", request.VIN),
                     new SqlParameter("@Price", request.Price),
                     new SqlParameter("@Color", request.Color),
                     new SqlParameter("@ImageUrl", request.ImageUrl),
+                    new SqlParameter("@NumberOfChairs", request.NumberOfChairs),
+                    new SqlParameter("@Horsepower", request.Horsepower),
+                    new SqlParameter("@MaximumSpeed", request.MaximumSpeed),
+                    new SqlParameter("@TrunkCapacity", request.TrunkCapacity),
                     vinOutParam
                 );
 
@@ -116,7 +120,7 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
             {
                 // Execute the stored procedure
                 await _dbContext.Database.ExecuteSqlRawAsync(
-                "EXEC dbo.UpdateVehicle @Id, @Name, @Description, @Brand, @Price, @Color, @ImageUrl, @Status",
+                "EXEC dbo.UpdateVehicle @Id, @Name, @Description, @Brand, @Price, @Color, @ImageUrl,@NumberOfChairs, @Horsepower, @MaximumSpeed, @TrunkCapacity,  @Status",
                 new SqlParameter("@Id", id),
                 new SqlParameter("@Name", request.Name),
                 new SqlParameter("@Description", request.Desciption),
@@ -124,9 +128,17 @@ namespace BiddingApp.Infrastructure.Repositories.VehicleRepositories
                 new SqlParameter("@Price", request.Price),
                 new SqlParameter("@Color", request.Color),
                 new SqlParameter("@ImageUrl", request.ImageUrl),
+                new SqlParameter("@NumberOfChairs", request.NumberOfChairs),
+                new SqlParameter("@Horsepower", request.Horsepower),
+                new SqlParameter("@MaximumSpeed", request.MaximumSpeed),
+                new SqlParameter("@TrunkCapacity", request.TrunkCapacity),
                 new SqlParameter("@Status", request.Status));
 
                 return true;
+            }
+            catch (BadRequestException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

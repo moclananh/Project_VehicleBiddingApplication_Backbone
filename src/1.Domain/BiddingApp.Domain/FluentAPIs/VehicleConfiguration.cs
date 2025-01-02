@@ -34,6 +34,19 @@ namespace BiddingApp.Domain.FluentAPIs
             builder.Property(v => v.Status)
                    .IsRequired();
 
+            builder.Property(v => v.NumberOfChairs)
+                   .IsRequired(); 
+
+            builder.Property(v => v.Horsepower)
+                   .IsRequired();
+
+            builder.Property(v => v.MaximumSpeed)
+                   .IsRequired();
+
+            builder.Property(v => v.TrunkCapacity)
+                   .IsRequired()
+                   .HasPrecision(10, 2);
+
             builder.HasMany(v => v.BiddingSessions)
                    .WithOne(bs => bs.Vehicle)
                    .HasForeignKey(bs => bs.VehicleId)

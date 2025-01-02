@@ -1,6 +1,7 @@
-﻿
-
+﻿using BiddingApp.BuildingBlock.Extentions;
+using BiddingApp.Domain.Models.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace BiddingApp.Infrastructure.Dtos.UserDtos
 {
@@ -10,7 +11,8 @@ namespace BiddingApp.Infrastructure.Dtos.UserDtos
         [EmailAddress]
         public string Email { get; set; }
         public string Password { get; set; }
-        public string Role { get; set; } // Admin, Customer
+        [JsonConverter(typeof(StringEnumConverter<UserRole>))]
+        public UserRole Role { get; set; } // Admin, Dealer
         public decimal Budget { get; set; }
     }
 }
