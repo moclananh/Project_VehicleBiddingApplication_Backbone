@@ -1,4 +1,5 @@
 using BiddingApp.Application.Hubs;
+using BiddingApp.Application.Services.AuthenticateServices;
 using BiddingApp.Application.Services.BiddingServices;
 using BiddingApp.Application.Services.BiddingSessionServices;
 using BiddingApp.Application.Services.UserServices;
@@ -42,6 +43,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
 builder.Services.AddScoped<IBiddingService, BiddingService>();
 builder.Services.AddScoped<IBiddingSessionService, BiddingSessionService>();
+builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 //register DI for signalr
 builder.Services.AddScoped<IBiddingNotificationService, BiddingNotificationService>();
 

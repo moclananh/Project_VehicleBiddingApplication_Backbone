@@ -7,7 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
+namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
 {
     public class BiddingSessionRepository : IBiddingSessionRepository
     {

@@ -1,11 +1,12 @@
 ﻿using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.Domain.Models.EF;
-using BiddingApp.Infrastructure.Repositories.BiddingSessionRepository;
+using BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories;
 using BiddingApp.Infrastructure.Repositories.BiddingRepositories;
 using BiddingApp.Infrastructure.Repositories.UserRepositories;
 using BiddingApp.Infrastructure.Repositories.VehicleRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using BiddingApp.Infrastructure.Repositories.AuthenticateRepositories;
 
 namespace BiddingApp.Infrastructure
 {
@@ -16,6 +17,7 @@ namespace BiddingApp.Infrastructure
         private IVehicleRepository? _vehicleRepository;
         private IBiddingRepository? _bidRepository;
         private IBiddingSessionRepository? _biddingSessionRepository;
+        private IAuthenticateRepository? _authenticateRepository;
         private readonly ILogger<UnitOfWork> _logger;
 
         // Constructor without injecting specific repositories
@@ -36,7 +38,8 @@ namespace BiddingApp.Infrastructure
 
         public IBiddingSessionRepository BiddingSessionRepository => 
             _biddingSessionRepository ??= new BiddingSessionRepository(_dbContext);
-
+        public IAuthenticateRepository AuthenticateRepository =>
+           _authenticateRepository ??= new AuthenticateRepository(_dbContext);
         public async Task SaveChangesAsync()
         {
             try

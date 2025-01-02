@@ -1,7 +1,7 @@
 ﻿using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Infrastructure.Dtos.BiddingSessionDtos;
 
-namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepository
+namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
 {
     public interface IBiddingSessionRepository
     {

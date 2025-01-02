@@ -1,4 +1,4 @@
-﻿using BiddingApp.Application.Services.UserServices;
+﻿using BiddingApp.Application.Services.AuthenticateServices;
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Infrastructure.Dtos.UserDtos;
@@ -8,18 +8,18 @@ namespace BiddingApp.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AuthenticateController : ControllerBase
     {
-        private readonly IUserService _userService;
-        public UsersController(IUserService userService)
+        private readonly IAuthenticateService _authenticateService;
+        public AuthenticateController(IAuthenticateService authenticateService)
         {
-            _userService = userService;
+            _authenticateService = authenticateService;
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(Guid id)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Login([FromBody] LoginVm request)
         {
             if (!ModelState.IsValid)
             {
@@ -31,14 +31,14 @@ namespace BiddingApp.Api.Controllers
                 });
             }
 
-            var response = await _userService.GetUserByid(id);
+            var response = await _authenticateService.Authencate(request);
             return Ok(response);
         }
 
-        [HttpGet("user-report/{id:guid}")]
+        [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetUserReport(Guid id, [FromQuery] UserReportFilter request)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Register([FromBody] RegisterVm request)
         {
             if (!ModelState.IsValid)
             {
@@ -50,7 +50,7 @@ namespace BiddingApp.Api.Controllers
                 });
             }
 
-            var response = await _userService.GetUserReport(id, request);
+            var response = await _authenticateService.Register(request);
             return Ok(response);
         }
     }
