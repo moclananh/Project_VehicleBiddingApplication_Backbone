@@ -141,10 +141,17 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
 
                 if (biddingSession != null)
                 {
+                    //map vehicle details
                     var vehicleDetails = await _dbContext.Vehicles
                         .FromSqlRaw("EXEC dbo.GetVehicleById @Id = {0}", biddingSession.VehicleId)
                         .ToListAsync();
                     biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
+
+                    //map winner user
+                    var userWinner = await _dbContext.Biddings
+                            .FromSqlRaw("EXEC dbo.GetWinnerUser @SessionId = {0}", biddingSession.Id)
+                            .ToListAsync();
+                    biddingSession.Biddings = userWinner;
                 }
 
                 return biddingSession;
