@@ -129,6 +129,66 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
             }
         }
 
+        public async Task<BiddingSessionResult> GetAllBiddingSessionByUserIdAsync(Guid userId, UserBiddingSessionFilter request)
+        {
+            var totalItemsParam = new SqlParameter("@TotalItem", SqlDbType.Int) { Direction = ParameterDirection.Output };
+            var itemCountsParam = new SqlParameter("@ItemCount", SqlDbType.Int) { Direction = ParameterDirection.Output };
+
+            try
+            {
+                // Execute the stored procedure and get the BiddingSessions
+                var biddingSessions = await _dbContext.BiddingSessions
+                    .FromSqlRaw(
+                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
+                        new SqlParameter("@PageNumber", request.PageNumber),
+                        new SqlParameter("@PageSize", request.PageSize),
+                        new SqlParameter("@StartTime", request.StartTime ?? (object)DBNull.Value),
+                        new SqlParameter("@EndTime", request.EndTime ?? (object)DBNull.Value),
+                        new SqlParameter("@VIN", request.VIN ?? (object)DBNull.Value),
+                        totalItemsParam,
+                        itemCountsParam)
+                    .ToListAsync();
+
+                // Map the related entities
+                if (biddingSessions != null)
+                {
+                    // Map vehicle information details
+                    foreach (var biddingSession in biddingSessions)
+                    {
+                        var vehicleDetails = await _dbContext.Vehicles
+                            .FromSqlRaw("EXEC dbo.GetVehicleById @Id = {0}", biddingSession.VehicleId)
+                            .ToListAsync();
+                        biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
+                    }
+
+                    // check user bidding status
+                    foreach (var biddingSession in biddingSessions)
+                    {
+                        var userWinner = await _dbContext.Biddings
+                            .FromSqlRaw("EXEC dbo.[CheckUserBiddingStatus] @SessionId = {0}, @UserId = {1}", biddingSession.Id, userId)
+                            .ToListAsync();
+                        biddingSession.Biddings = userWinner;
+                    }
+                }
+
+                // Retrieve total count
+                int totalItems = totalItemsParam.Value != DBNull.Value ? (int)totalItemsParam.Value : 0;
+                int itemCounts = itemCountsParam.Value != DBNull.Value ? (int)itemCountsParam.Value : 0;
+
+                // Return both the BiddingSessions and the total count encapsulated in BiddingSessionResult
+                return new BiddingSessionResult
+                {
+                    BiddingSessions = biddingSessions,
+                    TotalItems = totalItems,
+                    ItemCounts = itemCounts,
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
+            }
+        }
+
         public async Task<BiddingSession> GetBiddingSessionByIdAsync(Guid id)
         {
             try

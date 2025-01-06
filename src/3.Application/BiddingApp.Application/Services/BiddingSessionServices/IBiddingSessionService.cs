@@ -11,6 +11,7 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
         Task<ApiResponse<bool>> DisableBiddingSession(Guid id); //admin optional
         Task<ApiResponse<BiddingSessionVm>> GetBiddingSessionById(Guid id);
         Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingSessions(BiddingSessionFilter request);
+        Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingByUserId(Guid userId, UserBiddingSessionFilter request);
     }
 }
 

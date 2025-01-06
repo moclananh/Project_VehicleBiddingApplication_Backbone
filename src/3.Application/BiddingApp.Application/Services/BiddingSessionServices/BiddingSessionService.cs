@@ -174,5 +174,32 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
             }
         }
+
+        public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingByUserId(Guid userId, UserBiddingSessionFilter request)
+        {
+            try
+            {
+                var result = await _unitOfWork.BiddingSessionRepository.GetAllBiddingSessionByUserIdAsync(userId, request);
+
+                // Map the Todo entities to TodoVm ViewModels
+                var resultVmList = _mapper.Map<List<BiddingSessionVm>>(result.BiddingSessions);
+
+                // Create the paging result
+                var pagingResult = new PagingResult<BiddingSessionVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
+
+                return new ApiResponse<PagingResult<BiddingSessionVm>>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
+                    Data = pagingResult
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+            }
+        }
     }
 }

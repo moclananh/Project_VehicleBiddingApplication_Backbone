@@ -52,6 +52,24 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
+        [HttpGet("/api/session/users/{userId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetAllBiddingSessionByUserId(Guid userId, [FromQuery] UserBiddingSessionFilter request) //Admin role == admin ? (request.IsActive = null) : true
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = SystemConstants.ModelStateResponses.ModelStateInvalid
+                });
+            }
+            var response = await _biddingSessionService.GetAllBiddingByUserId(userId, request);
+            return Ok(response);
+        }
+
 
         [HttpGet("/api/session/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
