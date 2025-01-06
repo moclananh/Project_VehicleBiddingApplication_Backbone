@@ -52,7 +52,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/session/users/{userId:guid}")]
+        [HttpGet("/api/users/{userId:guid}/session")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllBiddingSessionByUserId(Guid userId, [FromQuery] UserBiddingSessionFilter request) //Admin role == admin ? (request.IsActive = null) : true

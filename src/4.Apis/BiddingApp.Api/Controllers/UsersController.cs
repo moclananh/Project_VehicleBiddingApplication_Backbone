@@ -35,7 +35,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet("user-report/{id:guid}")]
+        [HttpGet("{id:guid}/report")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetUserReport(Guid id, [FromQuery] UserReportFilter request)
