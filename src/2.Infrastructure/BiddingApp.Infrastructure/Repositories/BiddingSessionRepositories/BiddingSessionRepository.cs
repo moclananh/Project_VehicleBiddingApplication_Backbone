@@ -92,6 +92,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                 // Map the related entities
                 if (biddingSessions != null)
                 {
+                    // Map vehicle information details
                     foreach (var biddingSession in biddingSessions)
                     {
                         var vehicleDetails = await _dbContext.Vehicles
@@ -99,8 +100,17 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                             .ToListAsync();
                         biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
                     }
-                }
 
+                    // Map the winner user of each session
+                    foreach (var biddingSession in biddingSessions)
+                    {
+                        var userWinner = await _dbContext.Biddings
+                            .FromSqlRaw("EXEC dbo.GetWinnerUser @SessionId = {0}", biddingSession.Id)
+                            .ToListAsync();
+                        biddingSession.Biddings = userWinner;
+                    }
+                }
+                
                 // Retrieve total count
                 int totalItems = totalItemsParam.Value != DBNull.Value ? (int)totalItemsParam.Value : 0;
                 int itemCounts = itemCountsParam.Value != DBNull.Value ? (int)itemCountsParam.Value : 0;

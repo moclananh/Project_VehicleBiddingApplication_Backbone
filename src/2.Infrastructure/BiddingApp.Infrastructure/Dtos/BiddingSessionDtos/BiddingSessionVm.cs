@@ -1,4 +1,5 @@
-﻿using BiddingApp.Infrastructure.Dtos.VehicleDtos;
+﻿using BiddingApp.Infrastructure.Dtos.BiddingDtos;
+using BiddingApp.Infrastructure.Dtos.VehicleDtos;
 
 namespace BiddingApp.Infrastructure.Dtos.BiddingSessionDtos
 {
@@ -15,5 +16,7 @@ namespace BiddingApp.Infrastructure.Dtos.BiddingSessionDtos
         public int VehicleId { get; set; }
         //vehicle information
         public VehicleVm Vehicles { get; set; }
+        //user winner
+        public ICollection<BiddingVm> Biddings { get; set; }
     }
 }

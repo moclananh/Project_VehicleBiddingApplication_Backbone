@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using BiddingApp.BuildingBlock.Exceptions;
 using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
@@ -144,7 +143,7 @@ namespace BiddingApp.Application.Services.VehicleSevices
                 {
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
-                    Message = "Vehicle updated successfully"
+                    Message = SystemConstants.CommonResponse.UpdateSuccess
                 };
             }
             catch (BadRequestException)
