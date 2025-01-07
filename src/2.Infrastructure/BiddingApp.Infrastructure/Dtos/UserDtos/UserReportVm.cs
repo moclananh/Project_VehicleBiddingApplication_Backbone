@@ -4,6 +4,7 @@
     {
         public int BiddingId { get; set; }
         public decimal UserCurrentBidding { get; set; }
+        public DateTime BiddingAt { get; set; }
         public bool IsWinner { get; set; }
         public Guid SessionId { get; set; }
         public DateTime StartTime { get; set; }

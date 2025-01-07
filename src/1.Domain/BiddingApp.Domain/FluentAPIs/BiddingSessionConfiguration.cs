@@ -19,6 +19,8 @@ namespace BiddingApp.Domain.FluentAPIs
 
             builder.Property(bs => bs.EndTime)
                    .IsRequired();
+            builder.Property(bs => bs.CreateDate)
+                  .IsRequired();
 
             builder.Property(bs => bs.TotalBiddingCount)
                    .IsRequired();

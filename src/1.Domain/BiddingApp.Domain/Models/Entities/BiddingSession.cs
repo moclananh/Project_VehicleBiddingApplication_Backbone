@@ -5,6 +5,7 @@
         public Guid Id { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public DateTime CreateDate { get; set; }
         public int TotalBiddingCount {  get; set; }
         public decimal HighestBidding { get; set; }
         public decimal MinimumJumpingValue { get; set; }

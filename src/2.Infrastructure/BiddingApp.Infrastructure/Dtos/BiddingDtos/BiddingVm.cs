@@ -6,5 +6,6 @@
         public bool IsWinner { get; set; }
         public Guid UserId { get; set; }
         public Guid BiddingSessionId { get; set; }
+        public DateTime? BiddingAt { get; set;}
     }
 }

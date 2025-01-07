@@ -121,8 +121,7 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                 await _unitOfWork.BiddingSessionRepository.CloseBiddingSessionAsync(id);
 
                 //update status of vehicle when close session
-                var isBidding = await _unitOfWork.BidRepository.GetBiddingListByBiddingSessionIdAsync(session.Id);
-                if (isBidding.Count > 0) await _unitOfWork.VehicleRepository.UpdateVehicleStatusAsync(session.VehicleId, VehicleStatus.Sold);
+                if (session.TotalBiddingCount > 0) await _unitOfWork.VehicleRepository.UpdateVehicleStatusAsync(session.VehicleId, VehicleStatus.Sold);
                 else await _unitOfWork.VehicleRepository.UpdateVehicleStatusAsync(session.VehicleId, VehicleStatus.Available);
 
                 return new ApiResponse<bool>

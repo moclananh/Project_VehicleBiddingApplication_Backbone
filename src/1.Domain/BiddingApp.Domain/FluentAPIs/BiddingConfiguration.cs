@@ -16,6 +16,9 @@ namespace BiddingApp.Domain.FluentAPIs
             builder.Property(b => b.IsWinner)
                    .IsRequired();
 
+            builder.Property(b => b.BiddingAt)
+                  .IsRequired();
+
             builder.HasOne(b => b.User)
                    .WithMany(u => u.Bids)
                    .HasForeignKey(b => b.UserId)
