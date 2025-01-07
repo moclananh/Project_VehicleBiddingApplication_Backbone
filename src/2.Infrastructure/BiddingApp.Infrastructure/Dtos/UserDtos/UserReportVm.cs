@@ -3,7 +3,7 @@
     public class UserReportVm
     {
         public int BiddingId { get; set; }
-        public decimal UserCurrentBiddingValue { get; set; }
+        public decimal UserCurrentBidding { get; set; }
         public bool IsWinner { get; set; }
         public Guid SessionId { get; set; }
         public DateTime StartTime { get; set; }

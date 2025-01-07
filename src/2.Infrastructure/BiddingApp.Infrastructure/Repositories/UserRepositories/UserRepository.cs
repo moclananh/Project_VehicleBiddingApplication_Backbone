@@ -3,6 +3,7 @@ using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models.EF;
 using BiddingApp.Domain.Models.Entities;
 using BiddingApp.Infrastructure.Dtos.UserDtos;
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -37,68 +38,39 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
         {
             try
             {
-                // Build the query using LINQ with dynamic filtering
-                var query = _dbContext.Biddings
-                    .Join(_dbContext.BiddingSessions, b => b.BiddingSessionId, bs => bs.Id, (b, bs) => new { b, bs })
-                    .Join(_dbContext.Vehicles, bbs => bbs.bs.VehicleId, v => v.Id, (bbs, v) => new { bbs.b, bbs.bs, v })
-                    .Where(x => x.b.UserId == id);
-                var totalItems = await query.CountAsync();
-                // Apply filters dynamically based on the UserReportFilter
-                if (request.IsWinner.HasValue)
-                {
-                    query = query.Where(x => x.b.IsWinner == request.IsWinner.Value);
-                }
+                // Prepare the connection and command
+                var connection = _dbContext.Database.GetDbConnection();
 
-                if (request.StartTime.HasValue)
-                {
-                    query = query.Where(x => x.bs.StartTime >= request.StartTime.Value);
-                }
+                // Open connection
+                await connection.OpenAsync();
 
-                if (request.EndTime.HasValue)
-                {
-                    query = query.Where(x => x.bs.EndTime <= request.EndTime.Value);
-                }
+                // Prepare stored procedure parameters
+                var parameters = new DynamicParameters();
+                parameters.Add("UserId", id, DbType.Guid);
+                parameters.Add("PageNumber", request.PageNumber, DbType.Int32);
+                parameters.Add("PageSize", request.PageSize, DbType.Int32);
+                parameters.Add("IsWinner", request.IsWinner, DbType.Boolean);
+                parameters.Add("StartTime", request.StartTime, DbType.DateTime);
+                parameters.Add("EndTime", request.EndTime, DbType.DateTime);
+                parameters.Add("IsClosed", request.IsClosed, DbType.Boolean);
+                parameters.Add("VIN", request.VIN, DbType.String);
+                parameters.Add("VehicleName", request.VehicleName, DbType.String);
+                parameters.Add("TotalItems", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                parameters.Add("ItemCount", dbType: DbType.Int32, direction: ParameterDirection.Output);
 
-                if (request.IsClosed.HasValue)
-                {
-                    query = query.Where(x => x.bs.IsClosed == request.IsClosed.Value);
-                }
+                // Execute the stored procedure and map the results to the ViewModel
+                var reports = await connection.QueryAsync<UserReportVm>(
+                    "dbo.GetUserReportByUserIdWithPaging",
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
 
-                if (!string.IsNullOrEmpty(request.VehicleName))
-                {
-                    query = query.Where(x => x.v.Name.Contains(request.VehicleName));
-                }
+                var totalItems = parameters.Get<int>("TotalItems");
+                var itemCounts = parameters.Get<int>("ItemCount");
 
-                if (!string.IsNullOrEmpty(request.VIN))
-                {
-                    query = query.Where(x => x.v.VIN.Contains(request.VIN));
-                }
-
-                // Apply paging
-                var reports = await query
-                    .Skip((request.PageNumber - 1) * request.PageSize)
-                    .Take(request.PageSize)
-                    .Select(x => new UserReportVm
-                    {
-                        BiddingId = x.b.Id,
-                        UserCurrentBiddingValue = x.b.UserCurrentBidding,
-                        IsWinner = x.b.IsWinner,
-                        SessionId = x.bs.Id,
-                        StartTime = x.bs.StartTime,
-                        EndTime = x.bs.EndTime,
-                        IsClosed = x.bs.IsClosed,
-                        VehicleName = x.v.Name,
-                        VIN = x.v.VIN,
-                        ImageUrl = x.v.ImageUrl
-                    })
-                    .ToListAsync();
-
-                var itemCounts = reports.Count();
-
-                // Return paginated result
+                // Return the result
                 return new UserReportResult
                 {
-                    Reports = reports,
+                    Reports = reports.ToList(),
                     TotalItems = totalItems,
                     ItemCounts = itemCounts
                 };
