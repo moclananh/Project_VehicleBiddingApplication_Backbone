@@ -42,7 +42,7 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
                     .Join(_dbContext.BiddingSessions, b => b.BiddingSessionId, bs => bs.Id, (b, bs) => new { b, bs })
                     .Join(_dbContext.Vehicles, bbs => bbs.bs.VehicleId, v => v.Id, (bbs, v) => new { bbs.b, bbs.bs, v })
                     .Where(x => x.b.UserId == id);
-
+                var totalItems = await query.CountAsync();
                 // Apply filters dynamically based on the UserReportFilter
                 if (request.IsWinner.HasValue)
                 {
@@ -74,9 +74,6 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
                     query = query.Where(x => x.v.VIN.Contains(request.VIN));
                 }
 
-                // Get the total count of matching records before paging
-                var totalCount = await query.CountAsync();
-
                 // Apply paging
                 var reports = await query
                     .Skip((request.PageNumber - 1) * request.PageSize)
@@ -96,11 +93,14 @@ namespace BiddingApp.Infrastructure.Repositories.UserRepositories
                     })
                     .ToListAsync();
 
+                var itemCounts = reports.Count();
+
                 // Return paginated result
                 return new UserReportResult
                 {
                     Reports = reports,
-                    TotalCount = totalCount
+                    TotalItems = totalItems,
+                    ItemCounts = itemCounts
                 };
             }
             catch (Exception ex)

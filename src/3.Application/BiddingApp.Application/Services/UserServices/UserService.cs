@@ -4,6 +4,8 @@ using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.UserDtos;
+using BiddingApp.Infrastructure.Dtos.VehicleDtos;
+using BiddingApp.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -44,29 +46,31 @@ namespace BiddingApp.Application.Services.UserServices
             };
         }
 
-        public async Task<ApiResponse<UserReportResult>> GetUserReport(Guid id, UserReportFilter request)
+        public async Task<ApiResponse<PagingResult<UserReportVm>>> GetUserReport(Guid id, UserReportFilter request)
         {
-            // Fetch user from the repository
-            var result = await _unitOfWork.UserRepository.GetUserReportAsync(id, request);
-
-            // If user is not found, throw an exception
-            if (result.Reports.Count <= 0)
+            try
             {
-                return new ApiResponse<UserReportResult>
+                var result = await _unitOfWork.UserRepository.GetUserReportAsync(id, request);
+
+                // Map the Todo entities to TodoVm ViewModels
+                var resultVmList = _mapper.Map<List<UserReportVm>>(result.Reports);
+
+                // Create the paging result
+                var pagingResult = new PagingResult<UserReportVm>(request.PageNumber, request.PageSize, result.TotalItems, result.ItemCounts, resultVmList);
+
+                return new ApiResponse<PagingResult<UserReportVm>>
                 {
                     IsSuccess = true,
-                    Message = SystemConstants.CommonResponse.NoData,
-                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
+                    Data = pagingResult
                 };
             }
-
-            return new ApiResponse<UserReportResult>
+            catch (Exception ex)
             {
-                IsSuccess = true,
-                Message = SystemConstants.CommonResponse.FetchSuccess,
-                StatusCode = StatusCodes.Status200OK,
-                Data = result
-            };
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+            }
         }
     }
 }

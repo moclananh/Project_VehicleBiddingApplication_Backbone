@@ -3,6 +3,7 @@
     public class UserReportResult
     {
         public List<UserReportVm> Reports { get; set; }
-        public int TotalCount { get; set; }
+        public int TotalItems { get; set; }
+        public int ItemCounts { get; set; }
     }
 }

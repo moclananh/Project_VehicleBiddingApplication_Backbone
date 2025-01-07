@@ -16,7 +16,7 @@ namespace BiddingApp.Api.Controllers
             _biddingSessionService = biddingSessionService;
         }
 
-        [HttpPost("/api/session")]
+        [HttpPost("/api/sessions")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateBiddingSession([FromBody] CreateBiddingSessionRequest request)
@@ -34,7 +34,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/session")]
+        [HttpGet("/api/sessions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllBiddingSession([FromQuery] BiddingSessionFilter request) //Admin role == admin ? (request.IsActive = null) : true
@@ -52,7 +52,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpGet("/api/users/{userId:guid}/session")]
+        [HttpGet("/api/users/{userId:guid}/sessions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetAllBiddingSessionByUserId(Guid userId, [FromQuery] UserBiddingSessionFilter request) //Admin role == admin ? (request.IsActive = null) : true
@@ -71,7 +71,7 @@ namespace BiddingApp.Api.Controllers
         }
 
 
-        [HttpGet("/api/session/{id:guid}")]
+        [HttpGet("/api/sessions/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetBiddingSessionById(Guid id)
@@ -89,7 +89,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut("/api/session/close-session/{id:guid}")]
+        [HttpPut("/api/sessions/{id:guid}/close")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> CloseBiddingSession(Guid id)  //called when end session (this is manual option)
@@ -107,7 +107,7 @@ namespace BiddingApp.Api.Controllers
             return Ok(response);
         }
 
-        [HttpPut("/api/session/disable-session/{id:guid}")]
+        [HttpPut("/api/sessions/{id:guid}/disable")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DisableBiddingSession(Guid id)
