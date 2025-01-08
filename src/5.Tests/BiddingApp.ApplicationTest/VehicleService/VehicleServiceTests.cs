@@ -1,14 +1,4 @@
-﻿using AutoMapper;
-using BiddingApp.Application.Services.VehicleSevices;
-using BiddingApp.BuildingBlock.Exceptions;
-using BiddingApp.BuildingBlock.Utilities;
-using BiddingApp.Domain.Models.Entities;
-using BiddingApp.Domain.Models.Enums;
-using BiddingApp.Infrastructure;
-using BiddingApp.Infrastructure.Dtos.VehicleDtos;
-using BiddingApp.Infrastructure.Pagination;
-using Microsoft.Extensions.Logging;
-using Moq;
+﻿using BiddingApp.Infrastructure.Dtos.VehicleDtos;
 
 namespace BiddingApp.ApplicationTest.VehicleService
 {

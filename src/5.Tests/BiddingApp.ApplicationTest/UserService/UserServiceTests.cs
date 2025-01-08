@@ -1,16 +1,4 @@
-﻿using AutoMapper;
-using BiddingApp.BuildingBlock.Exceptions;
-using BiddingApp.BuildingBlock.Utilities;
-using BiddingApp.Domain.Models.Entities;
-using BiddingApp.Domain.Models.Enums;
-using BiddingApp.Infrastructure.Dtos.UserDtos;
-using BiddingApp.Infrastructure.Pagination;
-using BiddingApp.Infrastructure;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Moq;
-using BiddingApp.Application.Services.UserServices;
-using BiddingApp.Infrastructure.Repositories.UserRepositories;
+﻿using BiddingApp.Infrastructure.Repositories.UserRepositories;
 
 namespace BiddingApp.ApplicationTest.UserService
 {

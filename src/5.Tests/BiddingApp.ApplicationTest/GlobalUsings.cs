@@ -1,1 +1,14 @@
 global using Xunit;
+global using AutoMapper;
+global using BiddingApp.BuildingBlock.Exceptions;
+global using BiddingApp.BuildingBlock.Utilities;
+global using BiddingApp.Domain.Models;
+global using BiddingApp.Domain.Models.Entities;
+global using BiddingApp.Domain.Models.Enums;
+global using BiddingApp.Infrastructure;
+global using BiddingApp.Infrastructure.Dtos.UserDtos;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+global using Moq;
