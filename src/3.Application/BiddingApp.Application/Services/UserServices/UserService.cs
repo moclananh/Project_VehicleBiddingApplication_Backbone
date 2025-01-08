@@ -4,11 +4,9 @@ using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Infrastructure;
 using BiddingApp.Infrastructure.Dtos.UserDtos;
-using BiddingApp.Infrastructure.Dtos.VehicleDtos;
 using BiddingApp.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace BiddingApp.Application.Services.UserServices
 {

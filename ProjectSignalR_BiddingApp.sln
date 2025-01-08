@@ -3,23 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiddingApp.Domain", "src\1.Domain\BiddingApp.Domain\BiddingApp.Domain.csproj", "{1CC6B850-1AC0-40F6-9C94-B87B8A81D5D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiddingApp.Domain", "src\1.Domain\BiddingApp.Domain\BiddingApp.Domain.csproj", "{1CC6B850-1AC0-40F6-9C94-B87B8A81D5D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1.Domain", "1.Domain", "{01915B93-EBDE-458B-B17A-E9C5DB9EE5F5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.Infrastructure", "2.Infrastructure", "{67C43229-1148-48BA-92D1-9CAD9FE290BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiddingApp.Infrastructure", "src\2.Infrastructure\BiddingApp.Infrastructure\BiddingApp.Infrastructure.csproj", "{0ECAF7F4-84FA-4DF1-9E0B-69286449DAB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiddingApp.Infrastructure", "src\2.Infrastructure\BiddingApp.Infrastructure\BiddingApp.Infrastructure.csproj", "{0ECAF7F4-84FA-4DF1-9E0B-69286449DAB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiddingApp.BuildingBlock", "src\2.Infrastructure\BiddingApp.BuildingBlock\BiddingApp.BuildingBlock.csproj", "{D8889A17-B7A7-4929-ACB2-CCA6CD03B313}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiddingApp.BuildingBlock", "src\2.Infrastructure\BiddingApp.BuildingBlock\BiddingApp.BuildingBlock.csproj", "{D8889A17-B7A7-4929-ACB2-CCA6CD03B313}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3.Application", "3.Application", "{8F64DC19-1CE8-4741-BD6C-A0016F588085}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiddingApp.Application", "src\3.Application\BiddingApp.Application\BiddingApp.Application.csproj", "{6D0A136C-8409-43C7-A519-AC1F891B79DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiddingApp.Application", "src\3.Application\BiddingApp.Application\BiddingApp.Application.csproj", "{6D0A136C-8409-43C7-A519-AC1F891B79DD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4.Apis", "4.Apis", "{72B29350-AB33-4223-A525-5CC5931C9A1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiddingApp.Api", "src\4.Apis\BiddingApp.Api\BiddingApp.Api.csproj", "{F6405888-4EDD-4A65-83BD-04EC32ADE32D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BiddingApp.Api", "src\4.Apis\BiddingApp.Api\BiddingApp.Api.csproj", "{F6405888-4EDD-4A65-83BD-04EC32ADE32D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5.Tests", "5.Tests", "{4CF0270C-E0DA-46E6-AAE4-D4BC47006098}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BiddingApp.ApplicationTest", "src\5.Tests\BiddingApp.ApplicationTest\BiddingApp.ApplicationTest.csproj", "{53D6DE68-B804-4AE8-A3B0-2175AF25ECC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +51,10 @@ Global
 		{F6405888-4EDD-4A65-83BD-04EC32ADE32D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6405888-4EDD-4A65-83BD-04EC32ADE32D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6405888-4EDD-4A65-83BD-04EC32ADE32D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53D6DE68-B804-4AE8-A3B0-2175AF25ECC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D6DE68-B804-4AE8-A3B0-2175AF25ECC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D6DE68-B804-4AE8-A3B0-2175AF25ECC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D6DE68-B804-4AE8-A3B0-2175AF25ECC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +65,7 @@ Global
 		{D8889A17-B7A7-4929-ACB2-CCA6CD03B313} = {67C43229-1148-48BA-92D1-9CAD9FE290BD}
 		{6D0A136C-8409-43C7-A519-AC1F891B79DD} = {8F64DC19-1CE8-4741-BD6C-A0016F588085}
 		{F6405888-4EDD-4A65-83BD-04EC32ADE32D} = {72B29350-AB33-4223-A525-5CC5931C9A1D}
+		{53D6DE68-B804-4AE8-A3B0-2175AF25ECC1} = {4CF0270C-E0DA-46E6-AAE4-D4BC47006098}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BFF79C72-7716-4634-A010-DCCB74ADE73C}
