@@ -139,7 +139,8 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                 // Execute the stored procedure and get the BiddingSessions
                 var biddingSessions = await _dbContext.BiddingSessions
                     .FromSqlRaw(
-                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
+                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @UserId, @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
+                        new SqlParameter("@UserId", userId),
                         new SqlParameter("@PageNumber", request.PageNumber),
                         new SqlParameter("@PageSize", request.PageSize),
                         new SqlParameter("@StartTime", request.StartTime ?? (object)DBNull.Value),
