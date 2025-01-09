@@ -139,8 +139,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                 // Execute the stored procedure and get the BiddingSessions
                 var biddingSessions = await _dbContext.BiddingSessions
                     .FromSqlRaw(
-                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @UserId, @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
-                        new SqlParameter("@UserId", userId),
+                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
                         new SqlParameter("@PageNumber", request.PageNumber),
                         new SqlParameter("@PageSize", request.PageSize),
                         new SqlParameter("@StartTime", request.StartTime ?? (object)DBNull.Value),
@@ -162,7 +161,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                         biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
                     }
 
-                    // check user bidding status
+                    // check current user bidding status of each session
                     foreach (var biddingSession in biddingSessions)
                     {
                         var userWinner = await _dbContext.Biddings
@@ -208,9 +207,9 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                         .ToListAsync();
                     biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
 
-                    //map winner user
+                    //get top 10 users bidding of session
                     var userWinner = await _dbContext.Biddings
-                            .FromSqlRaw("EXEC dbo.GetWinnerUser @SessionId = {0}", biddingSession.Id)
+                            .FromSqlRaw("EXEC dbo.GetTop10Bidding @SessionId = {0}", biddingSession.Id)
                             .ToListAsync();
                     biddingSession.Biddings = userWinner;
                 }
