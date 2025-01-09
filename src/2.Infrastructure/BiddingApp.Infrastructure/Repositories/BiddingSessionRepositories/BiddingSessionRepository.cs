@@ -78,13 +78,15 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                 // Execute the stored procedure and get the BiddingSessions
                 var biddingSessions = await _dbContext.BiddingSessions
                     .FromSqlRaw(
-                        "EXEC dbo.GetBiddingSessionsWithPaging @PageNumber, @PageSize, @IsActive, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
+                        "EXEC dbo.GetBiddingSessionsWithPaging @PageNumber, @PageSize, @IsActive, @StartTime, @EndTime, @VIN, @Name, @Brand, @TotalItem OUTPUT, @ItemCount OUTPUT",
                         new SqlParameter("@PageNumber", request.PageNumber),
                         new SqlParameter("@PageSize", request.PageSize),
                         new SqlParameter("@IsActive", request.IsActive ?? (object)DBNull.Value),
                         new SqlParameter("@StartTime", request.StartTime ?? (object)DBNull.Value),
                         new SqlParameter("@EndTime", request.EndTime ?? (object)DBNull.Value),
                         new SqlParameter("@VIN", request.VIN ?? (object)DBNull.Value),
+                        new SqlParameter("@Name", request.Name ?? (object)DBNull.Value),
+                        new SqlParameter("@Brand", request.Brand ?? (object)DBNull.Value),
                         totalItemsParam,
                         itemCountsParam)
                     .ToListAsync();
@@ -139,12 +141,14 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                 // Execute the stored procedure and get the BiddingSessions
                 var biddingSessions = await _dbContext.BiddingSessions
                     .FromSqlRaw(
-                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @TotalItem OUTPUT, @ItemCount OUTPUT",
+                        "EXEC dbo.[GetBiddingSessionsByUserIdWithPaging] @PageNumber, @PageSize, @StartTime, @EndTime, @VIN, @Name, @Brand, @TotalItem OUTPUT, @ItemCount OUTPUT",
                         new SqlParameter("@PageNumber", request.PageNumber),
                         new SqlParameter("@PageSize", request.PageSize),
                         new SqlParameter("@StartTime", request.StartTime ?? (object)DBNull.Value),
                         new SqlParameter("@EndTime", request.EndTime ?? (object)DBNull.Value),
                         new SqlParameter("@VIN", request.VIN ?? (object)DBNull.Value),
+                        new SqlParameter("@Name", request.Name ?? (object)DBNull.Value),
+                        new SqlParameter("@Brand", request.Brand ?? (object)DBNull.Value),
                         totalItemsParam,
                         itemCountsParam)
                     .ToListAsync();
