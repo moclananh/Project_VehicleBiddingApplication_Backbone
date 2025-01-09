@@ -112,7 +112,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                         biddingSession.Biddings = userWinner;
                     }
                 }
-                
+
                 // Retrieve total count
                 int totalItems = totalItemsParam.Value != DBNull.Value ? (int)totalItemsParam.Value : 0;
                 int itemCounts = itemCountsParam.Value != DBNull.Value ? (int)itemCountsParam.Value : 0;
@@ -212,13 +212,38 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                     biddingSession.Vehicle = vehicleDetails.FirstOrDefault();
 
                     //get top 10 users bidding of session
-                    var userWinner = await _dbContext.Biddings
-                            .FromSqlRaw("EXEC dbo.GetTop10Bidding @SessionId = {0}", biddingSession.Id)
+                    var top10bids = await getTop10Bids(biddingSession.Id);
+                    if (top10bids != null)
+                    {
+                        foreach (var item in top10bids)
+                        {
+                            //map user details
+                            var user = await _dbContext.Users
+                            .FromSqlRaw("EXEC dbo.GetUserById @Id = {0}", item.UserId)
                             .ToListAsync();
-                    biddingSession.Biddings = userWinner;
+                            item.User = user.FirstOrDefault();
+                        }
+                    }
+                    biddingSession.Biddings = top10bids;
                 }
-
                 return biddingSession;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
+            }
+        }
+
+
+        private async Task<List<Bidding>> getTop10Bids(Guid biddingId)
+        {
+            try
+            {
+                //get top 10 users bidding of session
+                var top10bids = await _dbContext.Biddings
+                        .FromSqlRaw("EXEC dbo.GetTop10Bidding @SessionId = {0}", biddingId)
+                        .ToListAsync();
+                return top10bids;
 
             }
             catch (Exception ex)

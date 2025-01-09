@@ -17,7 +17,8 @@ namespace BiddingApp.Infrastructure.MapperConfigs
              .ForMember(dest => dest.Biddings, opt => opt.MapFrom(src => src.Biddings))
              .ReverseMap();
 
-            CreateMap<BiddingVm, Bidding>().ReverseMap();
+            CreateMap<BiddingVm, Bidding>().ReverseMap()
+             .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.User));
             CreateMap<VehicleVm, Vehicle>().ReverseMap();
         }
     }
