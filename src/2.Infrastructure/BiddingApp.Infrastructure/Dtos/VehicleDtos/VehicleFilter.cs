@@ -9,7 +9,7 @@ namespace BiddingApp.Infrastructure.Dtos.VehicleDtos
     {
         public string? Name { get; set; }
         [JsonConverter(typeof(StringEnumConverter<Brand>))]
-        public Brand? Brands { get; set; }
+        public Brand? Brand { get; set; }
         public string? VIN { get; set; }
         public string? Color { get; set; }
         [JsonConverter(typeof(StringEnumConverter<VehicleStatus>))]

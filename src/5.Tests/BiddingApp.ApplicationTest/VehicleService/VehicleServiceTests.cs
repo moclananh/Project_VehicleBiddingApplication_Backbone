@@ -28,7 +28,7 @@ namespace BiddingApp.ApplicationTest.VehicleService
                 VIN = "VIN123456",
                 Price = 50000,
                 Color = "Red",
-                Brands = Brand.BMW
+                Brand = Brand.BMW
             };
 
             _unitOfWorkMock
@@ -55,7 +55,7 @@ namespace BiddingApp.ApplicationTest.VehicleService
                 VIN = "VIN123456",
                 Price = 50000,
                 Color = "Red",
-                Brands = Brand.BMW
+                Brand = Brand.BMW
             };
 
             _unitOfWorkMock
