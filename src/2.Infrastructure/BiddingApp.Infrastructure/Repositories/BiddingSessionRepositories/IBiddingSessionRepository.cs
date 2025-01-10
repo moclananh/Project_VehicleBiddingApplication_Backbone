@@ -12,5 +12,6 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
         Task<bool> CreateBiddingSessionAsync(CreateBiddingSessionRequest request);
         Task<bool> CloseBiddingSessionAsync(Guid id); //called when end session
         Task<bool> DisableBiddingSessionAsync(Guid id); //admin optional
+        Task<List<Bidding>> GetUserBiddingStatus (Guid sessionId, Guid userId);
     }
 }

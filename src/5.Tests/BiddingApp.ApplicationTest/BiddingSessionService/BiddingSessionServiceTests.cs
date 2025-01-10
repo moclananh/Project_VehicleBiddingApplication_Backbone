@@ -479,7 +479,7 @@ namespace BiddingApp.ApplicationTest.BiddingSessionService
                 .Returns(biddingSessionVms);
 
             // Act
-            var response = await _biddingSessionService.GetAllBiddingByUserId(userId, filter);
+            var response = await _biddingSessionService.GetAllBiddingSessionsWithUserState(userId, filter);
 
             // Assert
             Assert.True(response.IsSuccess);

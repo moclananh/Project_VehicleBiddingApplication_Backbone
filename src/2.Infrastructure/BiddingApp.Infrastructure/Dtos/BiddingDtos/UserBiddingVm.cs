@@ -2,13 +2,13 @@
 
 namespace BiddingApp.Infrastructure.Dtos.BiddingDtos
 {
-    public class BiddingVm
+    public class UserBiddingVm
     {
         public Guid UserId { get; set; }
         public decimal UserCurrentBidding { get; set; }
         public bool IsWinner { get; set; }
         public Guid BiddingSessionId { get; set; }
-        public DateTime BiddingAt { get; set;}
-        public UserVm User { get; set; }
+        public DateTime? BiddingAt { get; set; }
+        public UserVm Users { get; set; }
     }
 }

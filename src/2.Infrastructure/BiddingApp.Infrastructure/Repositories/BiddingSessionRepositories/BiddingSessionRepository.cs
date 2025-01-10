@@ -168,9 +168,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                     // check current user bidding status of each session
                     foreach (var biddingSession in biddingSessions)
                     {
-                        var userWinner = await _dbContext.Biddings
-                            .FromSqlRaw("EXEC dbo.[CheckUserBiddingStatus] @SessionId = {0}, @UserId = {1}", biddingSession.Id, userId)
-                            .ToListAsync();
+                        var userWinner = await GetUserBiddingStatus(biddingSession.Id, userId);
                         biddingSession.Biddings = userWinner;
                     }
                 }
@@ -192,6 +190,7 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
                 throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
             }
         }
+
 
         public async Task<BiddingSession> GetBiddingSessionByIdAsync(Guid id)
         {
@@ -234,6 +233,20 @@ namespace BiddingApp.Infrastructure.Repositories.BiddingSessionRepositories
             }
         }
 
+        public async Task<List<Bidding>> GetUserBiddingStatus(Guid sessionId, Guid userId)
+        {
+            try
+            {
+               var result = await _dbContext.Biddings
+                            .FromSqlRaw("EXEC dbo.[CheckUserBiddingStatus] @SessionId = {0}, @UserId = {1}", sessionId, userId)
+                            .ToListAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.DatabaseBadResponse, ex.Message);
+            }
+        }
 
         private async Task<List<Bidding>> getTop10Bids(Guid biddingId)
         {

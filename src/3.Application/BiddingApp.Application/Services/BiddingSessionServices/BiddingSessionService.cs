@@ -4,6 +4,7 @@ using BiddingApp.BuildingBlock.Utilities;
 using BiddingApp.Domain.Models;
 using BiddingApp.Domain.Models.Enums;
 using BiddingApp.Infrastructure;
+using BiddingApp.Infrastructure.Dtos.BiddingDtos;
 using BiddingApp.Infrastructure.Dtos.BiddingSessionDtos;
 using BiddingApp.Infrastructure.Pagination;
 using Microsoft.AspNetCore.Http;
@@ -174,7 +175,7 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
             }
         }
 
-        public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingByUserId(Guid userId, UserBiddingSessionFilter request)
+        public async Task<ApiResponse<PagingResult<BiddingSessionVm>>> GetAllBiddingSessionsWithUserState(Guid userId, UserBiddingSessionFilter request)
         {
             try
             {
@@ -193,6 +194,40 @@ namespace BiddingApp.Application.Services.BiddingSessionServices
                     Message = SystemConstants.CommonResponse.FetchSuccess,
                     Data = pagingResult
                 };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+            }
+        }
+
+        public async Task<ApiResponse<UserBiddingSessionVm>> GetBiddingSessionByIdWithUserState(Guid userId, Guid sessionId)
+        {
+            try
+            {
+                var biddingSession = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(sessionId);
+
+                if (biddingSession is null) throw new NotFoundException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
+
+                var biddingSessionVm = _mapper.Map<UserBiddingSessionVm>(biddingSession);
+
+                //map user state
+                var userBidding = await _unitOfWork.BiddingSessionRepository.GetUserBiddingStatus(sessionId, userId);
+                biddingSessionVm.UserBiddingState = _mapper.Map<BiddingVm>(userBidding.FirstOrDefault());
+
+                return new ApiResponse<UserBiddingSessionVm>
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = SystemConstants.CommonResponse.FetchSuccess,
+                    Data = biddingSessionVm
+                };
+            }
+            catch (NotFoundException)
+            {
+                _logger.LogError(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
+                throw;
             }
             catch (Exception ex)
             {

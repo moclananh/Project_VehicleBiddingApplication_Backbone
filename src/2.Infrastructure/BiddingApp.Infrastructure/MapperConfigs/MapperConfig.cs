@@ -12,13 +12,22 @@ namespace BiddingApp.Infrastructure.MapperConfigs
         public MapperConfig()
         {
             CreateMap<UserVm, User>().ReverseMap();
+
             CreateMap<BiddingSession, BiddingSessionVm>()
              .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.Vehicle))
              .ForMember(dest => dest.Biddings, opt => opt.MapFrom(src => src.Biddings))
              .ReverseMap();
 
-            CreateMap<BiddingVm, Bidding>().ReverseMap()
-             .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.User));
+            CreateMap<BiddingSession, UserBiddingSessionVm>()
+            .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.Vehicle))
+            .ForMember(dest => dest.Biddings, opt => opt.MapFrom(src => src.Biddings))
+            .ReverseMap();
+
+            CreateMap<BiddingVm, Bidding>().ReverseMap();
+
+            CreateMap<UserBiddingVm, Bidding>().ReverseMap()
+            .ForMember(dest => dest.Users, opt => opt.MapFrom(src => src.User));
+
             CreateMap<VehicleVm, Vehicle>().ReverseMap();
         }
     }

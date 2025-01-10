@@ -55,7 +55,7 @@ namespace BiddingApp.Api.Controllers
         [HttpGet("/api/users/{userId:guid}/sessions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetAllBiddingSessionByUserId(Guid userId, [FromQuery] UserBiddingSessionFilter request) //Admin role == admin ? (request.IsActive = null) : true
+        public async Task<IActionResult> GetAllBiddingSessionsWithUserState(Guid userId, [FromQuery] UserBiddingSessionFilter request)
         {
             if (!ModelState.IsValid)
             {
@@ -66,10 +66,9 @@ namespace BiddingApp.Api.Controllers
                     Message = SystemConstants.ModelStateResponses.ModelStateInvalid
                 });
             }
-            var response = await _biddingSessionService.GetAllBiddingByUserId(userId, request);
+            var response = await _biddingSessionService.GetAllBiddingSessionsWithUserState(userId, request);
             return Ok(response);
         }
-
 
         [HttpGet("/api/sessions/{id:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -86,6 +85,24 @@ namespace BiddingApp.Api.Controllers
                 });
             }
             var response = await _biddingSessionService.GetBiddingSessionById(id);
+            return Ok(response);
+        }
+
+        [HttpGet("/api/users/{userId:guid}/sessions/{sessionId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetBiddingSessionByIdWithUserState(Guid userId, Guid sessionId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = SystemConstants.ModelStateResponses.ModelStateInvalid
+                });
+            }
+            var response = await _biddingSessionService.GetBiddingSessionByIdWithUserState(userId, sessionId);
             return Ok(response);
         }
 
