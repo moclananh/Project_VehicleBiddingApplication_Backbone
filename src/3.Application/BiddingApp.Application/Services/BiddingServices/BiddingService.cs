@@ -30,11 +30,14 @@ namespace BiddingApp.Application.Services.BiddingServices
             try
             {
                 //check bidding session is valid
-                var session = await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(request.BiddingSessionId);
-                if (session is null) {
+                var session =
+                    await _unitOfWork.BiddingSessionRepository.GetBiddingSessionByIdAsync(request.BiddingSessionId);
+                if (session is null)
+                {
                     _logger.LogError(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
-                    throw new NotFoundException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound); 
+                    throw new NotFoundException(SystemConstants.BiddingSessionMessageResponses.BiddingSessionNotFound);
                 }
+
                 if (session.IsClosed)
                 {
                     return new ApiResponse<bool>
@@ -63,6 +66,7 @@ namespace BiddingApp.Application.Services.BiddingServices
                     _logger.LogError(SystemConstants.AuthenticateResponses.UserNotExist);
                     throw new NotFoundException(SystemConstants.AuthenticateResponses.UserNotExist);
                 }
+
                 if (user.Budget < request.UserCurrentBidding)
                 {
                     return new ApiResponse<bool>
@@ -86,12 +90,14 @@ namespace BiddingApp.Application.Services.BiddingServices
                 }
 
                 //update highest price & count total bidding
-                var fetchHighestBiddingValue = await _unitOfWork.BiddingSessionRepository.FetchBiddingAsync(request.BiddingSessionId, request.UserCurrentBidding);
+                var fetchHighestBiddingValue =
+                    await _unitOfWork.BiddingSessionRepository.FetchBiddingAsync(request.BiddingSessionId,
+                        request.UserCurrentBidding);
                 if (!fetchHighestBiddingValue)
                 {
                     _logger.LogError(SystemConstants.CommonResponse.FetchFailed);
                     throw new BadRequestException(SystemConstants.CommonResponse.FetchFailed);
-                }    
+                }
 
                 // Call the repository to create the bidding session
                 await _unitOfWork.BidRepository.CreateBiddingRequestAsync(request);
@@ -101,6 +107,7 @@ namespace BiddingApp.Application.Services.BiddingServices
                     request.BiddingSessionId,
                     request.UserId,
                     request.UserCurrentBidding);
+                await _notificationService.NotifyAllSessionAsync(request.BiddingSessionId);
 
                 return new ApiResponse<bool>
                 {
@@ -113,14 +120,15 @@ namespace BiddingApp.Application.Services.BiddingServices
             {
                 throw;
             }
-            catch(BadRequestException)
+            catch (BadRequestException)
             {
                 throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, SystemConstants.InternalMessageResponses.InternalMessageError);
-                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError, ex.Message);
+                throw new InternalServerException(SystemConstants.InternalMessageResponses.InternalMessageError,
+                    ex.Message);
             }
         }
     }

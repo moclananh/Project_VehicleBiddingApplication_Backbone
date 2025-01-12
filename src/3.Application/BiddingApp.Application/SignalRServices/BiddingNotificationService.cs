@@ -22,5 +22,14 @@ namespace BiddingApp.Application.SignalRServices
                     UserCurrentBidding = bidValue,
                 });
         }
+
+        public async Task NotifyAllSessionAsync(Guid sessionId)
+        {
+            await _hubContext.Clients.All.SendAsync("SessionListUpdated", new
+            {
+                sessionId = sessionId,
+                Message = "Session list updated"
+            });
+        }
     }
 }
