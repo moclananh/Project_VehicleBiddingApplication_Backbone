@@ -51,12 +51,8 @@ namespace BiddingApp.Application.Services.BiddingServices
                 //check bidding value valid
                 if (request.UserCurrentBidding <= session.HighestBidding)
                 {
-                    return new ApiResponse<bool>
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = SystemConstants.BiddingMessageResponses.BiddingNotValid
-                    };
+                    _logger.LogError(SystemConstants.BiddingMessageResponses.BiddingNotValid);
+                    throw new BadRequestException(SystemConstants.BiddingMessageResponses.BiddingNotValid);
                 }
 
                 //check user budget is available
@@ -69,12 +65,8 @@ namespace BiddingApp.Application.Services.BiddingServices
 
                 if (user.Budget < request.UserCurrentBidding)
                 {
-                    return new ApiResponse<bool>
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = SystemConstants.AuthenticateResponses.UserBudgetCheck
-                    };
+                    _logger.LogError(SystemConstants.AuthenticateResponses.UserBudgetCheck);
+                    throw new BadRequestException(SystemConstants.AuthenticateResponses.UserBudgetCheck);
                 }
 
                 //check bidding exist
@@ -85,7 +77,7 @@ namespace BiddingApp.Application.Services.BiddingServices
                     if (!fetchUserState)
                     {
                         _logger.LogError(SystemConstants.CommonResponse.FetchFailed);
-                        throw new BadRequestException(SystemConstants.CommonResponse.FetchFailed);
+                        throw new InternalServerException(SystemConstants.CommonResponse.FetchFailed);
                     }
                 }
 
@@ -96,7 +88,7 @@ namespace BiddingApp.Application.Services.BiddingServices
                 if (!fetchHighestBiddingValue)
                 {
                     _logger.LogError(SystemConstants.CommonResponse.FetchFailed);
-                    throw new BadRequestException(SystemConstants.CommonResponse.FetchFailed);
+                    throw new InternalServerException(SystemConstants.CommonResponse.FetchFailed);
                 }
 
                 // Call the repository to create the bidding session
@@ -121,6 +113,11 @@ namespace BiddingApp.Application.Services.BiddingServices
                 throw;
             }
             catch (BadRequestException)
+            {
+                throw;
+            }
+
+            catch (InternalServerException)
             {
                 throw;
             }
