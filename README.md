@@ -4,7 +4,10 @@ A comprehensive ASP.NET Core backend API for a real-time vehicle bidding auction
 
 ## Project demo
 
-[Demo_Video_Link](https://drive.google.com/file/d/1ABw3LMAHKHIbqwpjAj-g2-5lP9ouV7zA/view?usp=sharing)
+## Project demo: [Demo_Video_Link](https://drive.google.com/file/d/1ABw3LMAHKHIbqwpjAj-g2-5lP9ouV7zA/view?usp=sharing)
+
+![bidding_demo2](bidding_demo2.png)
+![bidding_demo](bidding_demo1.png)
 
 ## Table of Contents
 
