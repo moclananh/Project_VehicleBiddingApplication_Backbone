@@ -1,0 +1,58 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: bidding-sqlserver
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: StrongPassword123!
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/1433'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - bidding-network
+
+  db-init:
+    image: mcr.microsoft.com/mssql-tools
+    container_name: bidding-db-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./BiddingDb2_v2.0.sql:/tmp/BiddingDb2_v2.0.sql
+    entrypoint: ["bash", "-lc", "echo Waiting for SQL Server...; until /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'StrongPassword123!' -Q 'SELECT 1' >/dev/null 2>&1; do sleep 2; done; echo Running DB init...; /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P 'StrongPassword123!' -i /tmp/BiddingDb2_v2.0.sql; echo DB init complete." ]
+    networks:
+      - bidding-network
+    restart: 'no'
+
+  api:
+    build:
+      context: .
+      dockerfile: src/4.Apis/BiddingApp.Api/Dockerfile
+    container_name: bidding-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=BiddingDb2;Persist Security Info=True;User ID=sa;Password=StrongPassword123!;TrustServerCertificate=True"
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - bidding-network
+    volumes:
+      - ./src/4.Apis/BiddingApp.Api/appsettings.json:/app/appsettings.json
+
+volumes:
+  sqlserver_data:
+
+networks:
+  bidding-network:
+    driver: bridge

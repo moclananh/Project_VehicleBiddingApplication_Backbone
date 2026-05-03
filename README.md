@@ -2,6 +2,10 @@
 
 A comprehensive ASP.NET Core backend API for a real-time vehicle bidding auction platform built with clean architecture principles, Entity Framework Core, JWT authentication, and SignalR for real-time updates.
 
+## Project demo
+
+[Demo_Video_Link](https://drive.google.com/file/d/1ABw3LMAHKHIbqwpjAj-g2-5lP9ouV7zA/view?usp=sharing)
+
 ## Table of Contents
 
 - [Project Overview](#project-overview)
@@ -73,22 +77,27 @@ This project follows the **Clean Architecture** pattern organized in 5 logical l
 ## Technologies Stack
 
 ### Core Framework
+
 - **ASP.NET Core 8.0**: Latest LTS framework
 - **Entity Framework Core 8.0**: ORM for data access
 - **SQL Server**: Database engine
 - **SignalR**: Real-time communication
 
 ### Authentication & Authorization
+
 - **JWT (JSON Web Tokens)**: Token-based authentication
 - **Microsoft.AspNetCore.Authentication.JwtBearer**: JWT bearer authentication
 
 ### API & Documentation
+
 - **Swagger/Swashbuckle 6.4.0**: API documentation and exploration
 
 ### Testing
+
 - Unit testing framework for service layer validation
 
 ### Other
+
 - **Docker**: Containerization support
 - **Dependency Injection**: Built-in DI container
 - **CORS**: Cross-origin request handling
@@ -182,6 +191,7 @@ This project implements industry-leading architectural patterns and best practic
 ### Core Architectural Patterns
 
 #### 1. **Clean Architecture**
+
 The application strictly adheres to Robert C. Martin's Clean Architecture principles with a clear separation of concerns across 5 distinct layers:
 
 - **Domain Layer**: Contains pure business logic, entity models, and domain rules. Has no external dependencies.
@@ -191,6 +201,7 @@ The application strictly adheres to Robert C. Martin's Clean Architecture princi
 - **Test Layer**: Comprehensive unit and integration tests ensuring code quality and reliability.
 
 #### 2. **Domain-Driven Design (DDD)**
+
 The project implements DDD concepts to model complex business domains:
 
 - **Entities**: Core business objects (User, Vehicle, BiddingSession, Bidding) with unique identities and lifecycle
@@ -200,6 +211,7 @@ The project implements DDD concepts to model complex business domains:
 - **Ubiquitous Language**: Domain models and services use business terminology (BiddingSession, HighestBidding, etc.)
 
 #### 3. **Repository Pattern**
+
 Abstracts data access logic and provides a collection-like interface:
 
 - Repositories encapsulate database queries
@@ -208,6 +220,7 @@ Abstracts data access logic and provides a collection-like interface:
 - Facilitates unit testing with mock repositories
 
 #### 4. **Unit of Work Pattern**
+
 Coordinates multiple repositories within a single business transaction:
 
 - Ensures atomic operations across multiple entities
@@ -215,6 +228,7 @@ Coordinates multiple repositories within a single business transaction:
 - Provides consistency guarantees
 
 #### 5. **Dependency Injection (DI)**
+
 ASP.NET Core's built-in DI container manages service lifetimes:
 
 - **Scoped**: Services tied to HTTP request lifetime
@@ -224,6 +238,7 @@ ASP.NET Core's built-in DI container manages service lifetimes:
 ### Database Technologies
 
 #### 1. **Entity Framework Core 8.0**
+
 Modern ORM providing:
 
 - LINQ-based query language
@@ -233,15 +248,18 @@ Modern ORM providing:
 - Database migrations
 
 #### 2. **Fluent API Configuration**
+
 Type-safe entity mapping without attributes
 
 **Benefits**:
+
 - Centralized configuration in dedicated classes
 - Strongly-typed and compile-time safe
 - Clear relationship definitions
 - Cascade delete behavior specification
 
 #### 3. **SQL Server**
+
 Enterprise-grade relational database with:
 
 - ACID compliance for data integrity
@@ -251,14 +269,17 @@ Enterprise-grade relational database with:
 - Read Committed Snapshot Isolation (RCSI) enabled
 
 #### 4. **SQL Stored Procedures**
+
 The database includes 20+ optimized stored procedures:
 
 **Authentication & User Management**:
+
 - `AuthenticateUser` - Validate user credentials
 - `GetUserById` - Retrieve user profile
 - `GetUserReportByUserIdWithPaging` - User bidding history with pagination
 
 **Bidding Operations**:
+
 - `CreateBidding` - Insert new bid with validation
 - `FetchBiddingValue` - Retrieve current bid amount
 - `GetBiddingListBySessionId` - Get all bids in a session
@@ -267,6 +288,7 @@ The database includes 20+ optimized stored procedures:
 - `GetTop10Bidding` - Leaderboard data
 
 **Session Management**:
+
 - `CreateBiddingSession` - Initialize new auction
 - `GetBiddingSessionById` - Retrieve session details
 - `GetBiddingSessionsByUserIdWithPaging` - User's sessions
@@ -276,6 +298,7 @@ The database includes 20+ optimized stored procedures:
 - `AutoCloseExpiredSessions` - Scheduled job for expired sessions
 
 **Vehicle Management**:
+
 - `CreateVehicle` - Add new vehicle to catalog
 - `GetVehicleById` - Retrieve vehicle details
 - `GetVehicleByVIN` - Search by VIN
@@ -283,6 +306,7 @@ The database includes 20+ optimized stored procedures:
 - `DeleteVehicle` - Remove vehicle from system
 
 #### 5. **Entity Framework Migrations**
+
 Version-controlled database schema changes:
 
 - `20250107093100_updateCreatedDateSession` - Session creation date tracking
@@ -294,9 +318,11 @@ Version-controlled database schema changes:
 ### Data Access Patterns
 
 #### 1. **Generic Repository Pattern**
+
 Implements CRUD operations for data persistence and retrieval
 
 #### 2. **Specification Pattern**
+
 Encapsulates query logic:
 
 - Filters, sorting, and pagination criteria
@@ -305,11 +331,13 @@ Encapsulates query logic:
 - Type-safe query construction
 
 #### 3. **Pagination**
+
 Efficient data retrieval for large datasets with page indexing and result counting
 
 ### Authentication & Security
 
 #### 1. **JWT (JSON Web Tokens)**
+
 Stateless authentication mechanism:
 
 - **Token Structure**: Header.Payload.Signature
@@ -319,12 +347,14 @@ Stateless authentication mechanism:
 - **Claims**: User ID, role, and custom claims
 
 #### 2. **Role-Based Access Control (RBAC)**
+
 Implements authorization based on user roles:
 
 - **Admin**: Full system access
 - **Dealer**: Bidding and user-specific operations
 
 #### 3. **Password Security**
+
 - Passwords encrypted before storage
 - Validation during authentication
 - Secure comparison to prevent timing attacks
@@ -332,6 +362,7 @@ Implements authorization based on user roles:
 ### Real-Time Communication
 
 #### 1. **SignalR**
+
 WebSocket-based real-time framework providing:
 
 - **Bi-directional Communication**: Server to client and vice versa
@@ -340,6 +371,7 @@ WebSocket-based real-time framework providing:
 - **Automatic Fallback**: Graceful degradation to polling if WebSocket unavailable
 
 #### 2. **Real-Time Events**
+
 - `UserJoined` - Notifies participants of new bidder
 - `UserLeft` - Alerts when bidder exits
 - `BidPlaced` - Broadcasts new bids in real-time
@@ -348,25 +380,30 @@ WebSocket-based real-time framework providing:
 ### API Design Patterns
 
 #### 1. **RESTful Principles**
+
 - Resource-oriented endpoints
 - Standard HTTP methods (GET, POST, PUT, DELETE)
 - Proper HTTP status codes
 - Consistent naming conventions (lowercase URLs)
 
 #### 2. **DTO (Data Transfer Object) Pattern**
+
 Separates internal domain models from API contracts
 
 - **Benefits**: Versioning flexibility, security (hide sensitive data), performance optimization
 
 #### 3. **Response Envelope Pattern**
+
 Consistent response format across all endpoints with success status, HTTP code, message, and data payload
 
 #### 4. **CORS (Cross-Origin Resource Sharing)**
+
 Enables secure cross-origin requests from specified origins with customizable policies
 
 ### Exception Handling
 
 #### 1. **Custom Exception Handler**
+
 Global exception handling middleware
 
 - Catches unhandled exceptions
@@ -375,6 +412,7 @@ Global exception handling middleware
 - Prevents internal error details from leaking
 
 #### 2. **Exception Types**
+
 - **ValidationException**: 400 Bad Request
 - **UnauthorizedException**: 401 Unauthorized
 - **ForbiddenException**: 403 Forbidden
@@ -384,6 +422,7 @@ Global exception handling middleware
 ### Testing Infrastructure
 
 #### 1. **Unit Testing Framework**
+
 Organized test projects by domain:
 
 - `AuthenticateService/` - Authentication logic tests
@@ -393,6 +432,7 @@ Organized test projects by domain:
 - `VehicleService/` - Vehicle catalog tests
 
 #### 2. **Testing Patterns**
+
 - **Arrange-Act-Assert (AAA)**: Clear test structure
 - **Mock Objects**: Isolated service testing
 - **Test Fixtures**: Reusable test data
@@ -401,16 +441,19 @@ Organized test projects by domain:
 ### Cross-Cutting Concerns
 
 #### 1. **Logging**
+
 - Integrated with ASP.NET Core logging
 - Error tracking and diagnostics
 - Performance monitoring
 
 #### 2. **Validation**
+
 - Model state validation at API layer
 - Business rule validation in services
 - Database constraints enforced
 
 #### 3. **Mappers & AutoMapper**
+
 Configuration-based object mapping:
 
 - Domain models ↔ DTOs
@@ -419,18 +462,18 @@ Configuration-based object mapping:
 
 ### Technology Stack Summary
 
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Framework | ASP.NET Core | 8.0 |
-| ORM | Entity Framework Core | 8.0.1 |
-| Database | SQL Server | 2019+ |
-| Authentication | JWT Bearer | 8.0.1 |
-| Real-Time | SignalR | Built-in |
-| API Documentation | Swagger/Swashbuckle | 6.4.0 |
-| Serialization | System.Text.Json | Built-in |
-| Containerization | Docker | - |
-| Language | C# | 12.0 |
-| Testing | xUnit (compatible) | - |
+| Category          | Technology            | Version  |
+| ----------------- | --------------------- | -------- |
+| Framework         | ASP.NET Core          | 8.0      |
+| ORM               | Entity Framework Core | 8.0.1    |
+| Database          | SQL Server            | 2019+    |
+| Authentication    | JWT Bearer            | 8.0.1    |
+| Real-Time         | SignalR               | Built-in |
+| API Documentation | Swagger/Swashbuckle   | 6.4.0    |
+| Serialization     | System.Text.Json      | Built-in |
+| Containerization  | Docker                | -        |
+| Language          | C#                    | 12.0     |
+| Testing           | xUnit (compatible)    | -        |
 
 ### Design Principles Applied
 
@@ -456,70 +499,138 @@ Configuration-based object mapping:
 
 ## API Endpoints
 
+List account test:
+
+```
+"admin",
+"password",
+"admin123",
+"Test1234!",
+"P@ssw0rd",
+"123456",
+"password123",
+"test123",
+"user123",
+"test",
+"test1",
+"test2",
+"test3",
+"test4",
+"tina",
+"admin@admin.com",
+"test@gmail.com",
+"tina@gmail.com",
+"user@example.com"
+"user123@example.com"
+```
+
+Password default: `123123`
+
 ### Authentication Controller
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/authenticate/login` | User login with JWT token |
-| POST | `/api/authenticate/register` | Register new user |
+
+| Method | Endpoint                     | Description               |
+| ------ | ---------------------------- | ------------------------- |
+| POST   | `/api/authenticate/login`    | User login with JWT token |
+| POST   | `/api/authenticate/register` | Register new user         |
 
 ### Users Controller
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/users/{id}` | Get user by ID |
-| GET | `/api/users/{id}/report` | Get user bidding report |
+
+| Method | Endpoint                 | Description             |
+| ------ | ------------------------ | ----------------------- |
+| GET    | `/api/users/{id}`        | Get user by ID          |
+| GET    | `/api/users/{id}/report` | Get user bidding report |
 
 ### Vehicles Controller
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/vehicles` | Get all vehicles |
-| GET | `/api/vehicles/{id}` | Get vehicle by ID |
-| POST | `/api/vehicles` | Create vehicle (Admin only) |
-| PUT | `/api/vehicles/{id}` | Update vehicle (Admin only) |
+
+| Method | Endpoint             | Description                 |
+| ------ | -------------------- | --------------------------- |
+| GET    | `/api/vehicles`      | Get all vehicles            |
+| GET    | `/api/vehicles/{id}` | Get vehicle by ID           |
+| POST   | `/api/vehicles`      | Create vehicle (Admin only) |
+| PUT    | `/api/vehicles/{id}` | Update vehicle (Admin only) |
 | DELETE | `/api/vehicles/{id}` | Delete vehicle (Admin only) |
 
 ### Bidding Sessions Controller
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/biddingsessions` | Get all sessions |
-| GET | `/api/biddingsessions/{id}` | Get session by ID |
-| POST | `/api/biddingsessions` | Create bidding session |
-| PUT | `/api/biddingsessions/{id}` | Update session |
-| DELETE | `/api/biddingsessions/{id}` | End session |
+
+| Method | Endpoint                    | Description            |
+| ------ | --------------------------- | ---------------------- |
+| GET    | `/api/biddingsessions`      | Get all sessions       |
+| GET    | `/api/biddingsessions/{id}` | Get session by ID      |
+| POST   | `/api/biddingsessions`      | Create bidding session |
+| PUT    | `/api/biddingsessions/{id}` | Update session         |
+| DELETE | `/api/biddingsessions/{id}` | End session            |
 
 ### Biddings Controller
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/biddings` | Place a bid |
-| GET | `/api/biddings/session/{sessionId}` | Get bids for session |
+
+| Method | Endpoint                            | Description          |
+| ------ | ----------------------------------- | -------------------- |
+| POST   | `/api/biddings`                     | Place a bid          |
+| GET    | `/api/biddings/session/{sessionId}` | Get bids for session |
 
 ## Getting Started
 
 ### Prerequisites
 
 - .NET 8.0 SDK or later
-- SQL Server 2019 or later
-- Visual Studio 2022 or VS Code with C# extensions
-- Docker (optional, for containerization)
+- Docker Desktop with WSL2 support (Windows) or Docker Engine on Linux/macOS
+- Optional: Visual Studio 2022 or VS Code with C# extensions
 
-### Installation
+### Installation (Local)
 
 1. Clone the repository
-2. Restore NuGet packages
-3. Update the database with Entity Framework migrations
-4. Build the solution
-5. Run the API project
+2. Open the solution in Visual Studio or VS Code
+3. Restore NuGet packages
+4. Apply migrations or run database setup scripts
+5. Build the solution
+6. Run the `BiddingApp.Api` project
 
 The API will be available at the configured endpoint with Swagger documentation.
 
-### Docker Deployment
+### Running with Docker
 
-Docker is configured for containerization. Build and run using Docker commands as per the Dockerfile in the API project.
+This project includes a `docker-compose.yml` file for running the backend API and SQL Server together.
+
+1. Open a bash shell in `Project_VehicleBiddingApplication_Backbone`
+2. Start the services:
+
+```bash
+cd /mnt/d/srcode/Project_VehicleBiddingApplication_Backbone
+docker compose up --build
+```
+
+3. The compose setup includes:
+   - `sqlserver`: SQL Server container
+   - `db-init`: temporary container to initialize `BiddingDb2` using `BiddingDb2_v2.0.sql`
+   - `api`: ASP.NET Core backend API
+
+4. After startup, access the API at:
+
+```text
+http://localhost:8080
+```
+
+5. To stop and remove the containers:
+
+```bash
+docker compose down
+```
+
+### Notes
+
+- The database script `BiddingDb2_v2.0.sql` is configured to use container-friendly paths.
+- The API container is configured to connect to SQL Server using the service name `sqlserver`.
+- If you need to rebuild the API image after changes, run:
+
+```bash
+docker compose up --build api
+```
 
 ## Configuration
 
 ### appsettings.json
 
 The application configuration includes:
+
 - **ConnectionStrings**: SQL Server database connection settings
 - **AppSettings**: JWT secret key, issuer, audience for token validation
 - **Logging**: Configurable log levels for diagnostics
@@ -536,6 +647,7 @@ The API is configured to accept requests from specified origins. Modify configur
 The application uses JWT (JSON Web Tokens) for stateless authentication.
 
 #### Token Generation Flow
+
 1. User calls `/api/authenticate/login` with credentials
 2. API validates credentials against the database
 3. JWT token is generated with:
@@ -544,9 +656,11 @@ The application uses JWT (JSON Web Tokens) for stateless authentication.
    - **Expiration**: Configurable (default in `Program.cs`)
 
 #### Using the Token
+
 Include JWT tokens in the Authorization header for protected endpoints
 
 #### Token Validation Parameters
+
 - `ValidateIssuer`: false
 - `ValidateAudience`: false
 - `ValidateIssuerSigningKey`: true
@@ -555,6 +669,7 @@ Include JWT tokens in the Authorization header for protected endpoints
 ### Authentication Service
 
 The `IAuthenticateService` interface provides:
+
 - `Authenticate(LoginVm request)` - Login user and return JWT token
 - `Register(RegisterVm request)` - Register new user account
 
@@ -565,10 +680,12 @@ The `IAuthenticateService` interface provides:
 The application uses SignalR for real-time bidding updates.
 
 #### Hub Methods (Client can invoke)
+
 - `JoinBiddingSession(sessionId)` - Join a bidding session
 - `LeaveBiddingSession(sessionId)` - Leave a bidding session
 
 #### Hub Events (Server sends to clients)
+
 - `UserJoined` - Notifies when user joins session
 - `UserLeft` - Notifies when user leaves session
 - `BidPlaced` - Notifies when new bid is placed
@@ -577,6 +694,7 @@ The application uses SignalR for real-time bidding updates.
 ### BiddingNotificationService
 
 Manages real-time notifications for bidding activities:
+
 - Broadcasts bid updates to all session participants
 - Updates highest bidding amount
 - Notifies when session ends
@@ -589,28 +707,33 @@ WebSocket connection for real-time updates is available at the bidding hub
 ## Services
 
 ### Authentication Service (`IAuthenticateService`)
+
 - User registration with role assignment
 - User login with credential validation
 - JWT token generation
 
 ### User Service (`IUserService`)
+
 - Retrieve user profile by ID
 - Generate user bidding reports with pagination
 - Track user bidding history
 
 ### Vehicle Service (`IVehicleService`)
+
 - Manage vehicle catalog
 - Vehicle search and filtering
 - Vehicle status updates
 - Pagination support
 
 ### Bidding Session Service (`IBiddingSessionService`)
+
 - Create new auction sessions
 - Manage session lifecycle (active, closed)
 - Track highest bidding and bid count
 - Calculate minimum jumping values
 
 ### Bidding Service (`IBiddingService`)
+
 - Place new bids
 - Validate bid amounts
 - Track winner determination
@@ -621,6 +744,7 @@ WebSocket connection for real-time updates is available at the bidding hub
 The project includes comprehensive unit tests in the `BiddingApp.ApplicationTest` project.
 
 ### Test Categories
+
 - **AuthenticateService Tests**: Login and registration validation
 - **BiddingService Tests**: Bid placement and validation
 - **BiddingSessionService Tests**: Session management
@@ -648,6 +772,7 @@ All error responses follow a standardized format with success status, HTTP statu
 The project uses Entity Framework Core migrations for database versioning.
 
 ### Recent Migrations
+
 - `20250107093100_updateCreatedDateSession` - Latest update
 - `20250107085327_updateBiddingDate` - Bidding date updates
 - `20250102014319_updateDbV3` - Database version 3 updates
@@ -663,6 +788,7 @@ Apply migrations using Entity Framework Core update command
 ## Development Guidelines
 
 ### Project Structure Best Practices
+
 1. **Domain Layer**: Pure business logic, no external dependencies
 2. **Infrastructure Layer**: Database access, external integrations
 3. **Application Layer**: Use cases, business services
